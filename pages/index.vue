@@ -1,12 +1,33 @@
 <template>
-  <el-container>
-    <el-header>Header</el-header>
-    <el-main>Main</el-main>
-  </el-container>
+  <div v-if="birthday">
+    <el-container>
+      <el-header>Header {{ birthday || 'foo' }}</el-header>
+      <el-main>Main</el-main>
+    </el-container>
+  </div>
+  <div v-else>
+    <Onboarding />
+  </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-
-export default Vue.extend({})
+export default {
+  name: 'Home',
+  head: {
+    title: 'Calendar of Your Life',
+    meta: [
+      {
+        hid: 'description',
+        name: 'description',
+        content:
+          'Track how many weeks of your life you have spent already and how many you have left',
+      },
+    ],
+  },
+  computed: {
+    birthday(): Date | undefined {
+      return (this as any).$store.state.birthday.date
+    },
+  },
+}
 </script>
