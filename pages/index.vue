@@ -1,7 +1,7 @@
 <template>
   <div v-if="birthday">
     <el-container>
-      <el-header>Header {{ birthday || 'foo' }}</el-header>
+      <el-header>Header {{ birthday }}</el-header>
       <el-main>Main</el-main>
     </el-container>
   </div>
@@ -11,7 +11,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import Vue from 'vue'
+
+export default Vue.extend({
   name: 'Home',
   head: {
     title: 'Calendar of Your Life',
@@ -25,9 +27,14 @@ export default {
     ],
   },
   computed: {
-    birthday(): Date | undefined {
-      return (this as any).$store.state.birthday.date
+    birthday() {
+      return this.$accessor.birthday.date
     },
   },
-}
+  mounted() {
+    setTimeout(() => {
+      this.$accessor.birthday.set({ date: new Date() })
+    }, 500)
+  },
+})
 </script>
