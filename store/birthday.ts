@@ -1,18 +1,17 @@
-interface BirthdayState {
-  date?: Date
+import { mutationTree } from 'typed-vuex'
+
+interface Store {
+  date: Date | null
 }
 
-export const state = (): BirthdayState => ({})
+interface SetPayload {
+  date: Date
+}
 
-export const mutations = {
-  set(
-    state: BirthdayState,
-    {
-      date,
-    }: {
-      date: Date
-    }
-  ) {
+export const state = (): Store => ({ date: null })
+
+export const mutations = mutationTree(state, {
+  set(state, { date }: SetPayload) {
     state.date = date
   },
-}
+})
