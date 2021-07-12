@@ -31,10 +31,10 @@ export default Vue.extend({
       return this.$accessor.birthday.date
     },
   },
-  mounted() {
-    setTimeout(() => {
-      this.$accessor.birthday.set({ date: new Date() })
-    }, 500)
-  },
+  // mounted() {
+  //   setTimeout(() => {
+  //     this.$accessor.birthday.set({ date: new Date() })
+  //   }, 500)
+  // },
 })
 </script>
