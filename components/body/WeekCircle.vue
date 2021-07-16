@@ -6,6 +6,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  name: 'BodyWeekCircle',
   props: {
     enabled: Boolean,
   },

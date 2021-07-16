@@ -21,6 +21,7 @@ type Year = Week[]
 const WEEKS_PER_YEAR = 52
 
 export default Vue.extend({
+  name: 'BodyCircles',
   computed: {
     years() {
       const weekCount = this.$accessor.birthday.currentWeek

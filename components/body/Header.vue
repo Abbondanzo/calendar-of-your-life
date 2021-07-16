@@ -10,6 +10,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  name: 'BodyHeader',
   computed: {
     currentWeek() {
       return this.$accessor.birthday.currentWeek
