@@ -1,0 +1,3 @@
+<template>
+  <OnboardingForm />
+</template>

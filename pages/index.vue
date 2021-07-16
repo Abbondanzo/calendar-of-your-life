@@ -1,12 +1,9 @@
 <template>
-  <div v-if="birthday">
-    <el-container>
-      <el-header>Header {{ birthday }}</el-header>
-      <el-main>Main</el-main>
-    </el-container>
+  <div v-if="hasBirthday">
+    <BodyRoot />
   </div>
   <div v-else>
-    <Onboarding />
+    <OnboardingRoot />
   </div>
 </template>
 
@@ -27,14 +24,9 @@ export default Vue.extend({
     ],
   },
   computed: {
-    birthday() {
-      return this.$accessor.birthday.date
+    hasBirthday() {
+      return Boolean(this.$accessor.birthday.date)
     },
   },
-  // mounted() {
-  //   setTimeout(() => {
-  //     this.$accessor.birthday.set({ date: new Date() })
-  //   }, 500)
-  // },
 })
 </script>
