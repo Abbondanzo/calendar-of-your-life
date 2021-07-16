@@ -14,6 +14,12 @@ export default Vue.extend({
 
 <style>
 .circle {
-  text-align: center;
+  height: 20px;
+  width: 20px;
+  border-color: #bbb;
+  border-radius: 50%;
+  border-style: solid;
+  border-width: 2px;
+  display: inline-block;
 }
 </style>
