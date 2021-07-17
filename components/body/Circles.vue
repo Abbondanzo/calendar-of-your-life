@@ -1,6 +1,12 @@
 <template>
-  <div>
-    <div v-for="(year, yearIndex) in years" :key="yearIndex" class="year-row">
+  <div id="circles">
+    <div
+      v-for="(year, yearIndex) in years"
+      :key="yearIndex"
+      :class="{ mounting: circleHeight === 0 }"
+      class="year-row"
+      :style="{ height: circleHeight + 'px' }"
+    >
       <div
         v-for="(week, weekIndex) in year"
         :key="weekIndex"
@@ -22,6 +28,9 @@ const WEEKS_PER_YEAR = 52
 
 export default Vue.extend({
   name: 'BodyCircles',
+  data() {
+    return { circleHeight: 0 }
+  },
   computed: {
     years() {
       const weekCount = this.$accessor.birthday.currentWeek
@@ -42,16 +51,52 @@ export default Vue.extend({
       return years
     },
   },
+  mounted() {
+    this.grabCircleHeightFromWidth()
+    window.addEventListener('resize', this.grabCircleHeightFromWidth)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.grabCircleHeightFromWidth)
+  },
+  methods: {
+    grabCircleHeightFromWidth() {
+      const circleElement: HTMLDivElement | null =
+        document.querySelector('.week-circle')
+      if (!circleElement) return
+      const trueWidth = circleElement.getBoundingClientRect().width
+      this.circleHeight = trueWidth
+    },
+  },
 })
 </script>
 
-<style>
+<style lang="scss">
+.mounting {
+  opacity: 0;
+}
+
 .year-row {
   white-space: nowrap;
   padding: 2px;
 }
+
 .week-circle {
-  display: inline;
-  padding: 2px;
+  display: inline-block;
+  position: relative;
+
+  $margin: 2;
+  margin: #{$margin}px;
+
+  $dimen: calc((100% / 52) - #{$margin * 2}px);
+  width: $dimen;
+  height: 100%;
+
+  @media screen and (max-width: 960px) {
+    $margin: 1;
+    margin: #{$margin}px;
+
+    $dimen: calc((100% / 52) - #{$margin * 2}px);
+    width: $dimen;
+  }
 }
 </style>

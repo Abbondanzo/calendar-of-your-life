@@ -1,5 +1,5 @@
 <template>
-  <span class="circle" />
+  <div class="circle" />
 </template>
 
 <script lang="ts">
@@ -13,14 +13,17 @@ export default Vue.extend({
 })
 </script>
 
-<style>
+<style lang="scss">
 .circle {
-  height: 20px;
-  width: 20px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   border-color: #bbb;
   border-radius: 50%;
   border-style: solid;
   border-width: 2px;
-  display: inline-block;
+  display: block;
 }
 </style>
