@@ -3,9 +3,9 @@
     <div
       v-for="(year, yearIndex) in years"
       :key="yearIndex"
-      :class="{ mounting: circleHeight === 0 }"
+      :class="{ mounting: yearRowWidth === 0 }"
       class="year-row"
-      :style="{ height: circleHeight + 'px' }"
+      :style="{ height: yearRowHeight + 'px', width: yearRowWidth + 'px' }"
     >
       <div
         v-for="(week, weekIndex) in year"
@@ -29,7 +29,7 @@ const WEEKS_PER_YEAR = 52
 export default Vue.extend({
   name: 'BodyCircles',
   data() {
-    return { circleHeight: 0 }
+    return { yearRowWidth: 0, yearRowHeight: 0 }
   },
   computed: {
     years() {
@@ -52,19 +52,24 @@ export default Vue.extend({
     },
   },
   mounted() {
-    this.grabCircleHeightFromWidth()
-    window.addEventListener('resize', this.grabCircleHeightFromWidth)
+    this.computeYearRowDimensions()
+    window.addEventListener('resize', this.computeYearRowDimensions)
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.grabCircleHeightFromWidth)
+    window.removeEventListener('resize', this.computeYearRowDimensions)
   },
   methods: {
-    grabCircleHeightFromWidth() {
-      const circleElement: HTMLDivElement | null =
-        document.querySelector('.week-circle')
-      if (!circleElement) return
-      const trueWidth = circleElement.getBoundingClientRect().width
-      this.circleHeight = trueWidth
+    computeYearRowDimensions() {
+      const wrapperElement: HTMLDivElement | null =
+        document.querySelector('#circles')
+      if (!wrapperElement) return
+      const trueWidth = wrapperElement.getBoundingClientRect().width
+
+      const yearRowHeight = Math.floor(trueWidth / WEEKS_PER_YEAR)
+      const yearRowWidth = yearRowHeight * WEEKS_PER_YEAR
+
+      this.yearRowWidth = yearRowWidth
+      this.yearRowHeight = yearRowHeight
     },
   },
 })
@@ -89,7 +94,7 @@ export default Vue.extend({
 
   $dimen: calc((100% / 52) - #{$margin * 2}px);
   width: $dimen;
-  height: 100%;
+  height: calc(100% - #{$margin * 2}px);
 
   @media screen and (max-width: 960px) {
     $margin: 1;
@@ -97,6 +102,7 @@ export default Vue.extend({
 
     $dimen: calc((100% / 52) - #{$margin * 2}px);
     width: $dimen;
+    height: calc(100% - #{$margin * 2}px);
   }
 }
 </style>
