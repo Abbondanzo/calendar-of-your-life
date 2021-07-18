@@ -1,20 +1,53 @@
+const appleTouchIcons = [
+  '57',
+  '60',
+  '72',
+  '76',
+  '114',
+  '120',
+  '144',
+  '152',
+  '180',
+].map((size) => ({
+  rel: 'apple-touch-icon',
+  sizes: `${size}x${size}`,
+  href: `/icons/apple-icon-${size}x${size}.png`,
+}))
+const pngIcons = ['16', '32', '96'].map((size) => ({
+  rel: 'icon',
+  type: 'image/png',
+  href: `/icons/favicon-${size}x${size}.png`,
+  sizes: `${size}x${size}`,
+}))
+
 export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'calendar-of-your-life',
+    title: 'Calendar of Your Life',
     htmlAttrs: {
       lang: 'en',
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
+      {
+        hid: 'description',
+        name: 'description',
+        content:
+          'On most days, life is sort of happening, passing you by. You are just busy keeping your head above water. So it is not easy to figure out what to do with your life and how to spend your time. The Calendar of Your Life website lets you track how many weeks of your life you have spent already and how many you have left.',
+      },
       { name: 'format-detection', content: 'telephone=no' },
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'apple-touch-icon', href: '/icons/apple-icon.png' },
+      ...appleTouchIcons,
+      ...pngIcons,
+      { rel: 'manifest', href: '/manifest.json' },
+    ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
