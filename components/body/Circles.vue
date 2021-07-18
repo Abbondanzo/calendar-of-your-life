@@ -1,25 +1,10 @@
 <template>
-  <div id="circles">
-    <div
-      v-for="(year, yearIndex) in years"
-      :key="yearIndex"
-      :class="{ mounting: yearRowWidth === 0 }"
-      class="year-row"
-      :style="{ height: yearRowHeight + 'px', width: yearRowWidth + 'px' }"
-    >
-      <div
-        v-for="(week, weekIndex) in year"
-        :key="weekIndex"
-        class="week-circle"
-      >
-        <BodyWeekCircle />
-      </div>
-    </div>
-  </div>
+  <canvas id="circles" />
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import { circleCanvasPainter } from '~/utils/circle-canvas'
 
 type Week = {}
 type Year = Week[]
@@ -32,7 +17,7 @@ export default Vue.extend({
     return { yearRowWidth: 0, yearRowHeight: 0 }
   },
   computed: {
-    years() {
+    years(): Year[] {
       const weekCount = this.$accessor.birthday.currentWeek
       if (weekCount === null) return []
       const yearsAlive = Math.floor(weekCount / WEEKS_PER_YEAR)
@@ -40,69 +25,38 @@ export default Vue.extend({
 
       // Build year rows
       const yearsToFill = yearsAlive + 1
-      const years = new Array<Year>(yearsToFill)
-        .fill([])
-        .map((_, index): Week => {
-          const weeksToFill =
-            index === yearsAlive ? weeksAliveCurrentYear : WEEKS_PER_YEAR
-          return new Array<Week>(weeksToFill).fill({}, 0, weeksToFill)
-        })
+      const years = new Array(yearsToFill).fill([]).map((_, index): Week => {
+        const weeksToFill =
+          index === yearsAlive ? weeksAliveCurrentYear : WEEKS_PER_YEAR
+        return new Array(weeksToFill).fill({}, 0, weeksToFill) as Year
+      }) as Year[]
 
       return years
     },
   },
   mounted() {
-    this.computeYearRowDimensions()
-    window.addEventListener('resize', this.computeYearRowDimensions)
-  },
-  beforeDestroy() {
-    window.removeEventListener('resize', this.computeYearRowDimensions)
+    this.drawInitialCircles()
   },
   methods: {
-    computeYearRowDimensions() {
-      const wrapperElement: HTMLDivElement | null =
-        document.querySelector('#circles')
-      if (!wrapperElement) return
-      const trueWidth = wrapperElement.getBoundingClientRect().width
+    drawInitialCircles() {
+      const canvas: HTMLCanvasElement = document.querySelector('#circles')!
+      const canvasPainter = circleCanvasPainter(canvas)
 
-      const yearRowHeight = Math.floor(trueWidth / WEEKS_PER_YEAR)
-      const yearRowWidth = yearRowHeight * WEEKS_PER_YEAR
+      canvasPainter.setRowSize(this.years.length)
+      canvasPainter.setColumnSize(this.years[0].length)
 
-      this.yearRowWidth = yearRowWidth
-      this.yearRowHeight = yearRowHeight
+      this.years.forEach((year, row) => {
+        year.forEach((_, column) => {
+          canvasPainter.drawCircle({ row, column })
+        })
+      })
     },
   },
 })
 </script>
 
 <style lang="scss">
-.mounting {
-  opacity: 0;
-}
-
-.year-row {
-  white-space: nowrap;
-  padding: 2px;
-}
-
-.week-circle {
-  display: inline-block;
-  position: relative;
-
-  $margin: 2;
-  margin: #{$margin}px;
-
-  $dimen: calc((100% / 52) - #{$margin * 2}px);
-  width: $dimen;
-  height: calc(100% - #{$margin * 2}px);
-
-  @media screen and (max-width: 960px) {
-    $margin: 1;
-    margin: #{$margin}px;
-
-    $dimen: calc((100% / 52) - #{$margin * 2}px);
-    width: $dimen;
-    height: calc(100% - #{$margin * 2}px);
-  }
+#circles {
+  max-width: 100%;
 }
 </style>
