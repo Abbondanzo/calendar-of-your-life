@@ -15,7 +15,7 @@ export default Vue.extend({
         hid: 'description',
         name: 'description',
         content:
-          'Track how many weeks of your life you have spent already and how many you have left',
+          'On most days, life is sort of happening, passing you by. You are just busy keeping your head above water. So it is not easy to figure out what to do with your life and how to spend your time. The Calendar of Your Life website lets you track how many weeks of your life you have spent already and how many you have left.',
       },
     ],
   },
