@@ -1,10 +1,6 @@
 <template>
-  <div v-if="hasBirthday">
-    <BodyRoot />
-  </div>
-  <div v-else>
-    <OnboardingRoot />
-  </div>
+  <BodyRoot v-if="hasBirthday" />
+  <OnboardingRoot v-else />
 </template>
 
 <script lang="ts">

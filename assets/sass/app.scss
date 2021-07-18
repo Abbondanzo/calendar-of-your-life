@@ -1,16 +1,40 @@
+@import 'element-variables';
 @import 'fonts';
+@import 'normalize';
+
+div#__nuxt,
+#__layout,
+#__layout > div,
+#app {
+  min-height: 100vh;
+}
 
 #app {
+  * {
+    font-family: 'Giga Sans Extra Bold', sans-serif;
+  }
+
   h1 {
     color: #1e1f1c;
-    font-family: 'Giga Sans Extra Bold', sans-serif;
     font-size: 60px;
     text-transform: uppercase;
   }
   h2 {
     color: #1e1f1c;
-    font-family: 'Giga Sans Extra Bold', sans-serif;
     font-size: 18px;
     text-transform: uppercase;
+  }
+
+  input {
+    border-radius: 0;
+    border-width: 2px;
+    padding-top: 1.5em;
+    padding-bottom: 1.5em;
+  }
+
+  button {
+    border-radius: 100px;
+    font-size: 18px;
+    line-height: 1.2;
   }
 }

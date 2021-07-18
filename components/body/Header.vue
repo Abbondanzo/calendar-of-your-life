@@ -23,8 +23,9 @@ export default Vue.extend({
 header {
   text-align: center;
 
-  h1 {
-    margin-bottom: -20px;
+  h1,
+  h2 {
+    margin: 0;
   }
 }
 </style>

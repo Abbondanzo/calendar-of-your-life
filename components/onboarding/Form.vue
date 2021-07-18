@@ -1,7 +1,8 @@
 <template>
-  <el-container>
+  <el-container id="onboarding-form">
     <el-main justify="center">
       <h1 class="title">Enter Your Birthdate</h1>
+      <h2>Let's find out how much time is left</h2>
       <el-form ref="form" :model="form">
         <el-form-item
           prop="tempBirthday"
@@ -84,8 +85,27 @@ export default Vue.extend({
 })
 </script>
 
-<style>
-.title {
+<style lang="scss" scoped>
+#onboarding-form {
   text-align: center;
+  display: flex;
+
+  h1,
+  h2 {
+    margin: 0;
+  }
+
+  form {
+    width: 500px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-top: 4em;
+
+    input,
+    .el-input,
+    button {
+      width: 100%;
+    }
+  }
 }
 </style>
