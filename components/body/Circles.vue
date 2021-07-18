@@ -58,5 +58,6 @@ export default Vue.extend({
 <style lang="scss">
 #circles {
   max-width: 100%;
+  margin: 0 auto;
 }
 </style>

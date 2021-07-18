@@ -1,7 +1,7 @@
 <template>
   <header>
     <h1>Calendar of Your Life</h1>
-    <p>Time is limited and precious. How do you want to spend it?</p>
+    <h2>Time is limited and precious. How do you want to spend it?</h2>
     <p>Weeks Elapsed: {{ currentWeek }}</p>
   </header>
 </template>
@@ -18,3 +18,13 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style lang="scss" scoped>
+header {
+  text-align: center;
+
+  h1 {
+    margin-bottom: -20px;
+  }
+}
+</style>
