@@ -9,11 +9,11 @@ div#__nuxt,
   min-height: 100vh;
 }
 
-#app {
-  * {
-    font-family: 'Giga Sans Extra Bold', sans-serif;
-  }
+* {
+  font-family: 'Giga Sans Extra Bold', sans-serif;
+}
 
+#app {
   h1 {
     color: #1e1f1c;
     font-size: 60px;
