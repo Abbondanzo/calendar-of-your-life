@@ -18,7 +18,12 @@ export default {
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: ['element-ui/lib/theme-chalk/index.css'],
+  css: [
+    '@/assets/sass/app.scss',
+    'element-ui/lib/theme-chalk/index.css',
+    'element-ui/lib/theme-chalk/reset.css',
+  ],
+  styleResources: { scss: ['@/assets/sass/element-variables.scss'] },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: ['@/plugins/element-ui'],
@@ -30,6 +35,7 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
+    'nuxt-typed-vuex',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules

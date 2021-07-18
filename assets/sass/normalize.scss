@@ -1,0 +1,43 @@
+html,
+body {
+  height: auto;
+}
+html {
+  height: 100%;
+}
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+div,
+blockquote {
+  margin: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+}
+ul {
+  cursor: default;
+  -webkit-margin-before: 0px;
+  -webkit-margin-after: 0px;
+  -webkit-margin-start: 0px;
+  -webkit-margin-end: 0px;
+  -webkit-padding-start: 0px;
+}
+:focus {
+  outline: 0;
+}
+a,
+a:focus,
+a:hover,
+a:visited {
+  text-decoration: none;
+  cursor: pointer;
+}
+* {
+  box-sizing: border-box;
+}

@@ -1,0 +1,145 @@
+$font-path: '/fonts';
+
+@font-face {
+  font-family: 'Giga Sans Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Giga Sans Regular'),
+    url('#{$font-path}/giga-sans-regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Italic';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Giga Sans Italic'),
+    url('#{$font-path}/giga-sans-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Thin';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Giga Sans Thin'),
+    url('#{$font-path}/giga-sans-thin.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Thin Italic';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Giga Sans Thin Italic'),
+    url('#{$font-path}/giga-sans-thin-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Extra Light';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Giga Sans Extra Light'),
+    url('#{$font-path}/giga-sans-extra-light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Extra Light Italic';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Giga Sans Extra Light Italic'),
+    url('#{$font-path}/giga-sans-extra-light-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Light';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Giga Sans Light'),
+    url('#{$font-path}/giga-sans-light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Light Italic';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Giga Sans Light Italic'),
+    url('#{$font-path}/giga-sans-light-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Medium';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Giga Sans Medium'),
+    url('#{$font-path}/giga-sans-medium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Medium Italic';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Giga Sans Medium Italic'),
+    url('#{$font-path}/giga-sans-medium-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Semi Bold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Giga Sans Semi Bold'),
+    url('#{$font-path}/giga-sans-semi-bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Semi Bold Italic';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Giga Sans Semi Bold Italic'),
+    url('#{$font-path}/giga-sans-semi-bold-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Bold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Giga Sans Bold'),
+    url('#{$font-path}/giga-sans-bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Bold Italic';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Giga Sans Bold Italic'),
+    url('#{$font-path}/giga-sans-bold-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Extra Bold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Giga Sans Extra Bold'),
+    url('#{$font-path}/giga-sans-extra-bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Extra Bold Italic';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Giga Sans Extra Bold Italic'),
+    url('#{$font-path}/giga-sans-extra-bold-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Black';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Giga Sans Black'),
+    url('#{$font-path}/giga-sans-black.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Giga Sans Black Italic';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Giga Sans Black Italic'),
+    url('#{$font-path}/giga-sans-black-italic.woff') format('woff');
+}
