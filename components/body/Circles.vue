@@ -1,15 +1,15 @@
 <template>
   <div class="circles-wrapper">
-    <BodyArrow text="Weeks of Your Life" />
+    <BodyArrow text="Weeks of Your Life" :arrow-on-bottom="true" />
     <div class="canvas-wrapper">
       <div class="rotated">
-        <BodyArrow text="Years of Your Life" />
+        <BodyArrow text="Years of Your Life" :arrow-on-bottom="false" />
       </div>
       <div class="forward">
         <canvas id="circles" />
       </div>
       <div class="rotated">
-        <BodyArrow text="Stages of Your Life" />
+        <BodyArrow text="Stages of Your Life" :arrow-on-bottom="false" />
       </div>
     </div>
   </div>
@@ -68,8 +68,12 @@ export default Vue.extend({
     align-items: flex-start;
 
     .rotated {
-      transform: rotate(90deg) translateX(50%);
       flex: 0;
+
+      & > * {
+        transform-origin: top left;
+        transform: rotate(90deg) translate(0, -100%);
+      }
     }
 
     .forward {
