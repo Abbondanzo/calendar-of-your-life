@@ -1,5 +1,18 @@
 <template>
-  <canvas id="circles" />
+  <div class="circles-wrapper">
+    <BodyArrow text="Weeks of Your Life" />
+    <div class="canvas-wrapper">
+      <div class="rotated">
+        <BodyArrow text="Years of Your Life" />
+      </div>
+      <div class="forward">
+        <canvas id="circles" />
+      </div>
+      <div class="rotated">
+        <BodyArrow text="Stages of Your Life" />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -45,8 +58,27 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-#circles {
+.circles-wrapper {
   max-width: 100%;
   margin: 0 auto;
+  overflow: hidden;
+
+  .canvas-wrapper {
+    display: flex;
+    align-items: flex-start;
+
+    .rotated {
+      transform: rotate(90deg) translateX(50%);
+      flex: 0;
+    }
+
+    .forward {
+      flex: 1;
+
+      canvas {
+        max-width: 100%;
+      }
+    }
+  }
 }
 </style>
