@@ -2,15 +2,9 @@
   <div class="circles-wrapper">
     <BodyArrow text="Weeks of Your Life" :arrow-on-bottom="true" />
     <div class="canvas-wrapper">
-      <div class="rotated">
-        <BodyArrow text="Years of Your Life" :arrow-on-bottom="false" />
-      </div>
-      <div class="forward">
-        <canvas id="circles" />
-      </div>
-      <div class="rotated">
-        <BodyArrow text="Stages of Your Life" :arrow-on-bottom="false" />
-      </div>
+      <BodyArrow text="Years of Your Life" :arrow-on-bottom="false" />
+      <canvas id="circles" />
+      <BodyArrow text="Stages of Your Life" :arrow-on-bottom="false" />
     </div>
   </div>
 </template>
@@ -23,9 +17,6 @@ let canvasPainter: CircleCanvasPainter
 
 export default Vue.extend({
   name: 'BodyCircles',
-  data() {
-    return { yearRowWidth: 0, yearRowHeight: 0 }
-  },
   mounted() {
     const canvas: HTMLCanvasElement = document.querySelector('#circles')!
     const circleMatrix = this.$accessor.circles.circleMatrix
@@ -59,30 +50,12 @@ export default Vue.extend({
 
 <style lang="scss">
 .circles-wrapper {
-  max-width: 100%;
   margin: 0 auto;
-  overflow: hidden;
 
   .canvas-wrapper {
     display: flex;
     align-items: flex-start;
-
-    .rotated {
-      flex: 0;
-
-      & > * {
-        transform-origin: top left;
-        transform: rotate(90deg) translate(0, -100%);
-      }
-    }
-
-    .forward {
-      flex: 1;
-
-      canvas {
-        max-width: 100%;
-      }
-    }
+    justify-content: center;
   }
 }
 </style>
