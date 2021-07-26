@@ -12,7 +12,7 @@ interface SetPayload {
 const tmp = new Date(1998, 4, 21)
 
 export const state = (): Store => ({
-  date: null,
+  date: tmp,
 })
 
 const ONE_DAY = 1000 * 60 * 60 * 24

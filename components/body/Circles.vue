@@ -1,16 +1,16 @@
 <template>
   <div class="circles-wrapper">
-    <BodyArrow text="Weeks of Your Life" />
     <div class="canvas-wrapper">
-      <div class="rotated">
-        <BodyArrow text="Years of Your Life" />
+      <div class="top">
+        <BodyArrow text="Weeks of Your Life" :arrow-on-bottom="true" />
       </div>
-      <div class="forward">
-        <canvas id="circles" />
+      <div class="rotated left">
+        <BodyArrow text="Years of Your Life" :arrow-on-bottom="false" />
       </div>
-      <div class="rotated">
-        <BodyArrow text="Stages of Your Life" />
+      <div class="rotated right">
+        <BodyArrow text="Stages of Your Life" :arrow-on-bottom="false" />
       </div>
+      <canvas id="circles" ref="circles" />
     </div>
   </div>
 </template>
@@ -23,11 +23,8 @@ let canvasPainter: CircleCanvasPainter
 
 export default Vue.extend({
   name: 'BodyCircles',
-  data() {
-    return { yearRowWidth: 0, yearRowHeight: 0 }
-  },
   mounted() {
-    const canvas: HTMLCanvasElement = document.querySelector('#circles')!
+    const canvas = this.$refs.circles as HTMLCanvasElement
     const circleMatrix = this.$accessor.circles.circleMatrix
     const rowCount = circleMatrix.length
     const columnCount = circleMatrix.length > 0 ? circleMatrix[0].length : 0
@@ -59,24 +56,54 @@ export default Vue.extend({
 
 <style lang="scss">
 .circles-wrapper {
-  max-width: 100%;
   margin: 0 auto;
-  overflow: hidden;
 
   .canvas-wrapper {
-    display: flex;
-    align-items: flex-start;
+    $padding: 48;
+    $arrow-padding: 10;
+    $axis-width: 28;
 
-    .rotated {
-      transform: rotate(90deg) translateX(50%);
-      flex: 0;
+    display: inline-block;
+    position: relative;
+    padding: $padding + px;
+    // display: flex;
+    // align-items: flex-start;
+    // justify-content: center;
+
+    #circles {
+      max-width: 100%;
     }
 
-    .forward {
-      flex: 1;
+    .top {
+      position: absolute;
+      top: 0;
+      left: $padding + $axis-width + px;
+    }
+
+    .rotated {
+      position: absolute;
+      top: $padding + px;
 
       canvas {
-        max-width: 100%;
+        position: absolute;
+        transform-origin: top left;
+        transform: rotate(90deg);
+      }
+
+      &.left {
+        left: $padding - $arrow-padding + px;
+
+        canvas {
+          transform: rotate(90deg);
+        }
+      }
+
+      &.right {
+        right: $padding - $arrow-padding + px;
+
+        canvas {
+          transform: rotate(90deg) translateY(-100%);
+        }
       }
     }
   }
