@@ -22,6 +22,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 header {
   text-align: center;
+  padding: 4em 0;
 
   h1,
   h2 {
