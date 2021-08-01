@@ -81,8 +81,8 @@ export default Vue.extend({
     }
 
     .rotated {
-      position: absolute;
-      top: $padding + px;
+      position: sticky;
+      top: 12px;
 
       canvas {
         position: absolute;
@@ -92,6 +92,7 @@ export default Vue.extend({
 
       &.left {
         left: $padding - $arrow-padding + px;
+        float: left;
 
         canvas {
           transform: rotate(90deg);
@@ -100,6 +101,7 @@ export default Vue.extend({
 
       &.right {
         right: $padding - $arrow-padding + px;
+        float: right;
 
         canvas {
           transform: rotate(90deg) translateY(-100%);
