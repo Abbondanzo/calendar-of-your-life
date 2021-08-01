@@ -19,10 +19,10 @@ const ONE_DAY = 1000 * 60 * 60 * 24
 
 export const getters = getterTree(state, {
   currentWeek: (state) => {
-    const birthdate = state.date
-    if (!birthdate) return null
+    const birthDate = state.date
+    if (!birthDate) return null
     const nowEpoch = new Date().getTime()
-    const birthdayEpoch = birthdate.getTime()
+    const birthdayEpoch = birthDate.getTime()
     const daysBetween = Math.round((nowEpoch - birthdayEpoch) / ONE_DAY)
     return Math.ceil(daysBetween / 7)
   },
