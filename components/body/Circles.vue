@@ -19,6 +19,8 @@
 import Vue from 'vue'
 import { CircleCanvasPainter } from '~/utils/circle-canvas'
 
+const WEEKS_PER_YEAR = 52
+
 let canvasPainter: CircleCanvasPainter
 
 export default Vue.extend({
@@ -35,6 +37,7 @@ export default Vue.extend({
     })
     this.drawInitialCircles()
     this.drawStages()
+    this.drawCurrentWeek()
   },
   methods: {
     drawInitialCircles() {
@@ -49,6 +52,14 @@ export default Vue.extend({
     drawStages() {
       const labels = this.$accessor.circles.rightAxisLabels
       labels.forEach(canvasPainter.drawRightAxis)
+    },
+    drawCurrentWeek() {
+      const currentWeek = this.$accessor.birthday.currentWeek
+      if (!currentWeek) return
+
+      const row = Math.floor(currentWeek / WEEKS_PER_YEAR)
+      const column = currentWeek % WEEKS_PER_YEAR
+      canvasPainter.drawBubble({ text: 'You are here', row, column })
     },
   },
 })
@@ -66,9 +77,6 @@ export default Vue.extend({
     display: inline-block;
     position: relative;
     padding: $padding + px;
-    // display: flex;
-    // align-items: flex-start;
-    // justify-content: center;
 
     #circles {
       max-width: 100%;

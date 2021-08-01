@@ -4,6 +4,9 @@ const FONT = '12px "Giga Sans Extra Bold"'
 const PADDING = 2
 const RADIUS_WIDTH = 2
 const STEP_SIZE = DIAMETER + 2 * PADDING
+const TOOLTIP_BACKGROUND = '#333'
+const TOOLTIP_FONT = '18px "Giga Sans Extra Bold"'
+const TOOLTIP_PADDING = 12
 
 interface Circle {
   row: number
@@ -16,6 +19,12 @@ interface RightAxisLabel {
   rowStart: number
   rowEnd: number
   color: string
+}
+
+interface BubbleLabel {
+  text: string
+  row: number
+  column: number
 }
 
 interface ConstructorArguments {
@@ -62,11 +71,8 @@ export class CircleCanvasPainter {
   }
 
   drawCircle({ row, column, color }: Circle) {
-    if (row >= this.rowCount || row < 0) return
-    if (column >= this.columnCount || column < 0) return
+    const { x, y } = this.getCoords(row, column)
 
-    const x = STEP_SIZE * column + STEP_SIZE / 2 + AXIS_WIDTH
-    const y = STEP_SIZE * row + STEP_SIZE / 2
     const context = this.getContext()
     context.lineWidth = RADIUS_WIDTH
     context.strokeStyle = color
@@ -75,6 +81,72 @@ export class CircleCanvasPainter {
     context.arc(x, y, DIAMETER / 2, 0, Math.PI * 2, true)
     context.closePath()
     context.stroke()
+  }
+
+  drawBubble({ text, row, column }: BubbleLabel) {
+    const { x, y } = this.getCoords(row, column)
+
+    const context = this.getContext()
+    context.font = TOOLTIP_FONT
+    context.textBaseline = 'top'
+    context.textAlign = 'start'
+    const metrics = context.measureText(text)
+    const width = metrics.width + TOOLTIP_PADDING * 2
+    const height =
+      metrics.actualBoundingBoxDescent -
+      metrics.actualBoundingBoxAscent +
+      TOOLTIP_PADDING * 2
+
+    this.roundRect(x, y, width, height, 5, TOOLTIP_BACKGROUND)
+    context.fillStyle = '#fff'
+    context.fillText(text, x + TOOLTIP_PADDING, y + TOOLTIP_PADDING)
+  }
+
+  getCoords(row: number, column: number): { x: number; y: number } {
+    if (row >= this.rowCount || row < 0) {
+      throw new Error(`Invalid row ${row}. Range is 0 to ${this.rowCount}`)
+    }
+    if (column >= this.columnCount || column < 0) {
+      throw new Error(
+        `Invalid column ${column}. Range is 0 to ${this.columnCount}`
+      )
+    }
+
+    const x = STEP_SIZE * column + STEP_SIZE / 2 + AXIS_WIDTH
+    const y = STEP_SIZE * row + STEP_SIZE / 2
+
+    return { x, y }
+  }
+
+  private roundRect(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radius: number = 5,
+    fill?: string,
+    stroke?: string
+  ) {
+    const ctx = this.getContext()
+    ctx.beginPath()
+    ctx.moveTo(x + radius, y)
+    ctx.lineTo(x + width - radius, y)
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius)
+    ctx.lineTo(x + width, y + height - radius)
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height)
+    ctx.lineTo(x + radius, y + height)
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius)
+    ctx.lineTo(x, y + radius)
+    ctx.quadraticCurveTo(x, y, x + radius, y)
+    ctx.closePath()
+    if (fill) {
+      ctx.fillStyle = fill
+      ctx.fill()
+    }
+    if (stroke) {
+      ctx.strokeStyle = stroke
+      ctx.stroke()
+    }
   }
 
   private updateDimensions() {
