@@ -32,7 +32,7 @@
     "eslint-plugin-vue": "^7.14.0",
     "fibers": "^5.0.0",
     "jest": "^27.0.5",
-    "prettier": "^2.3.2",
+    "prettier": "^2.6.2",
     "sass": "^1.36.0",
     "sass-loader": "^10.1.1",
     "ts-jest": "^27.0.4",
