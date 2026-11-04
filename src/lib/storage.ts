@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   DEFAULT_PRINT_OPTIONS,
   normalizePrintOptions,
   type PrintOptions,
 } from './print'
+import { normalizeEstimate, type EstimateInput } from './expectancy'
 
 export type Theme = 'system' | 'light' | 'dark'
 
@@ -19,6 +20,8 @@ export interface Settings {
   showStageColors: boolean
   theme: Theme
   print: PrintOptions
+  /** When set, `lifeExpectancy` follows a personal estimate */
+  estimate: EstimateInput | null
 }
 
 const KEY = 'calendar-of-your-life:v1'
@@ -29,6 +32,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showStageColors: true,
   theme: 'system',
   print: DEFAULT_PRINT_OPTIONS,
+  estimate: null,
 }
 
 function load(): Settings {
@@ -43,6 +47,7 @@ function load(): Settings {
         ? (saved.theme as Theme)
         : DEFAULT_SETTINGS.theme,
       print: normalizePrintOptions(saved.print),
+      estimate: normalizeEstimate(saved.estimate),
     }
   } catch {
     return DEFAULT_SETTINGS
@@ -61,7 +66,9 @@ export function useSettings() {
     }
   }, [settings])
 
-  const update = (patch: Partial<Settings>) =>
-    setSettings((s) => ({ ...s, ...patch }))
+  const update = useCallback(
+    (patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch })),
+    [],
+  )
   return [settings, update] as const
 }
