@@ -1,0 +1,31 @@
+/* Giga Sans, served from the repo as one family with real weights. */
+@font-face {
+  font-family: 'Giga Sans';
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/giga-sans-regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'Giga Sans';
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/giga-sans-medium.woff') format('woff');
+}
+@font-face {
+  font-family: 'Giga Sans';
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/giga-sans-bold.woff') format('woff');
+}
+@font-face {
+  font-family: 'Giga Sans';
+  font-weight: 800;
+  font-display: swap;
+  src: url('../assets/fonts/giga-sans-extra-bold.woff') format('woff');
+}
+@font-face {
+  font-family: 'Giga Sans';
+  font-weight: 900;
+  font-display: swap;
+  src: url('../assets/fonts/giga-sans-black.woff') format('woff');
+}
