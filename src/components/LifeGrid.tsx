@@ -8,6 +8,11 @@ import {
   type LifePosition,
 } from '../lib/life'
 import { formatDate } from '../lib/format'
+import {
+  theirWeekOn,
+  type Companion,
+  type CompanionSpan,
+} from '../lib/companion'
 import { toContent } from '../lib/viewport'
 import { useZoomPan } from '../hooks/useZoomPan'
 
@@ -31,6 +36,13 @@ interface Props {
   current: LifePosition
   showStageColors: boolean
   ariaLabel: string
+  together: Shared | null
+}
+
+/** A second life drawn on the same grid */
+export interface Shared {
+  companion: Companion
+  span: CompanionSpan
 }
 
 const cx = (week: number) => LEFT + week * STEP + STEP / 2
@@ -238,17 +250,72 @@ function CurrentWeek({
   )
 }
 
+/**
+ * The companion's lifetime as one shaded shape behind the weeks, like a text
+ * selection running from the week they were born to their expected last.
+ */
+const TogetherBand = memo(function TogetherBand({
+  span,
+}: {
+  span: CompanionSpan
+}) {
+  const { start, end, birthIndex } = span
+  if (end <= start) return null
+  const x = (week: number) => LEFT + week * STEP
+  const y = (age: number) => TOP + age * STEP
+  const r0 = Math.floor(start / WEEKS_PER_YEAR)
+  const w0 = start % WEEKS_PER_YEAR
+  const r1 = Math.floor((end - 1) / WEEKS_PER_YEAR)
+  const w1 = ((end - 1) % WEEKS_PER_YEAR) + 1
+  const points =
+    r0 === r1
+      ? [
+          [x(w0), y(r0)],
+          [x(w1), y(r0)],
+          [x(w1), y(r0 + 1)],
+          [x(w0), y(r0 + 1)],
+        ]
+      : [
+          [x(w0), y(r0)],
+          [x(WEEKS_PER_YEAR), y(r0)],
+          [x(WEEKS_PER_YEAR), y(r1)],
+          [x(w1), y(r1)],
+          [x(w1), y(r1 + 1)],
+          [x(0), y(r1 + 1)],
+          [x(0), y(r0 + 1)],
+          [x(w0), y(r0 + 1)],
+        ]
+  return (
+    <g className="together">
+      <polygon
+        className="together-band"
+        points={points.map((p) => p.join(',')).join(' ')}
+      />
+      {birthIndex !== null && (
+        <circle
+          className="together-birth"
+          cx={cx(birthIndex % WEEKS_PER_YEAR)}
+          cy={cy(Math.floor(birthIndex / WEEKS_PER_YEAR))}
+          r={RADIUS + 3}
+        />
+      )}
+    </g>
+  )
+})
+
 /** A non-interactive grid that scales to fit its box, used for print. */
 export function StaticLifeGrid({
   years,
   current,
   showStageColors,
   ariaLabel,
+  together,
 }: {
   years: number
   current: LifePosition
   showStageColors: boolean
   ariaLabel?: string
+  together: Shared | null
 }) {
   const { width, height } = posterSize(years)
   return (
@@ -259,6 +326,7 @@ export function StaticLifeGrid({
       aria-label={ariaLabel}
       aria-hidden={ariaLabel ? undefined : true}
     >
+      {together && <TogetherBand span={together.span} />}
       <Poster
         years={years}
         currentIndex={current.index}
@@ -280,6 +348,7 @@ export function LifeGrid({
   current,
   showStageColors,
   ariaLabel,
+  together,
 }: Props) {
   const [selected, setSelected] = useState<Cell | null>(null)
 
@@ -326,6 +395,7 @@ export function LifeGrid({
         : index === current.index
           ? 'This week'
           : 'Ahead of you'
+    const theirs = together && theirWeekOn(together.companion, start)
     // Anchor to the cell, flipping so the tooltip stays inside the viewport
     const sx = view.x + cx(selected.week) * view.scale
     const sy = view.y + cy(selected.age) * view.scale
@@ -350,6 +420,11 @@ export function LifeGrid({
         <span>
           {formatDate(start)} – {formatDate(end)}
         </span>
+        {theirs && together && (
+          <span className="tooltip-together">
+            {together.companion.name}: age {theirs.age}, week {theirs.week + 1}
+          </span>
+        )}
         <em>{status}</em>
       </div>
     )
@@ -371,6 +446,7 @@ export function LifeGrid({
       >
         <svg className="life-grid" role="img" aria-label={ariaLabel}>
           <g transform={`translate(${view.x} ${view.y}) scale(${view.scale})`}>
+            {together && <TogetherBand span={together.span} />}
             <Poster
               years={years}
               currentIndex={current.index}
