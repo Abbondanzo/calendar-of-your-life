@@ -1,45 +1,30 @@
 {
   "name": "calendar-of-your-life",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
-    "start": "nuxt start",
-    "generate": "nuxt generate",
-    "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
-    "lint": "npm run lint:js",
-    "test": "jest"
-  },
-  "dependencies": {
-    "core-js": "^3.15.1",
-    "element-ui": "^2.15.2",
-    "nuxt": "^2.15.7",
-    "nuxt-typed-vuex": "^0.2.0"
-  },
-  "devDependencies": {
-    "@babel/eslint-parser": "^7.14.7",
-    "@nuxt/types": "^2.15.7",
-    "@nuxt/typescript-build": "^2.1.0",
-    "@nuxtjs/eslint-config-typescript": "^6.0.1",
-    "@nuxtjs/eslint-module": "^3.0.2",
-    "@vue/test-utils": "^1.2.2",
-    "babel-core": "7.0.0-bridge.0",
-    "babel-jest": "^27.0.5",
-    "eslint": "^7.31.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-nuxt": "^2.0.0",
-    "eslint-plugin-vue": "^7.14.0",
-    "fibers": "^5.0.0",
-    "jest": "^27.0.5",
-    "prettier": "^2.3.2",
-    "sass": "^1.36.0",
-    "sass-loader": "^10.1.1",
-    "ts-jest": "^27.0.4",
-    "typescript": "^4.3.5",
-    "vue-jest": "^3.0.4"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "format": "prettier --write ."
   },
   "engines": {
-    "node": ">=10 <16"
+    "node": ">=20"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "prettier": "^3.9.10",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
   }
 }
