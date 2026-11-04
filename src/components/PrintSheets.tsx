@@ -8,7 +8,12 @@ import {
 } from '../lib/life'
 import { formatDate, formatNumber } from '../lib/format'
 import type { PrintOptions } from '../lib/print'
+import { milestonesByWeek, type Milestone } from '../lib/milestones'
+import { parseISODate } from '../lib/life'
 import { StaticLifeGrid } from './LifeGrid'
+
+/** How many milestones fit on the stats page */
+const MAX_PRINTED_MILESTONES = 6
 
 interface Props {
   birth: Date
@@ -17,6 +22,7 @@ interface Props {
   lifeExpectancy: number
   showStageColors: boolean
   options: PrintOptions
+  milestones: readonly Milestone[]
   /** Previews skip the accessible labels, since the real page has them. */
   preview?: boolean
 }
@@ -78,8 +84,14 @@ function StatsPage({
   stats,
   lifeExpectancy,
   showStageColors,
+  milestones,
 }: Omit<Props, 'options' | 'preview'>) {
   const { position } = stats
+  // Already sorted and limited to the grid by milestonesByWeek
+  const marked = [
+    ...milestonesByWeek(birth, milestones, stats.years).entries(),
+  ].flatMap(([index, group]) => group.map((m) => ({ index, ...m })))
+  const shown = marked.slice(0, MAX_PRINTED_MILESTONES)
   const stage = stageForAge(position.age)
   const stages = stageProgress(stats.years, position.index)
   const birthdaysAhead = Math.max(0, lifeExpectancy - position.age - 1)
@@ -133,6 +145,33 @@ function StatsPage({
           })}
         </ul>
       </section>
+      {shown.length > 0 && (
+        <section className="sheet-milestones">
+          <h2>Milestones</h2>
+          <ol>
+            {shown.map((m) => (
+              <li
+                key={m.id}
+                className={m.index <= position.index ? 'past' : undefined}
+              >
+                <span className="milestone-star" aria-hidden="true">
+                  ★
+                </span>
+                <span className="milestone-label">{m.label}</span>
+                <span className="milestone-when">
+                  {formatDate(parseISODate(m.date)!)} · Age{' '}
+                  {Math.floor(m.index / WEEKS_PER_YEAR)}
+                </span>
+              </li>
+            ))}
+          </ol>
+          {marked.length > shown.length && (
+            <p className="sheet-more">
+              +{marked.length - shown.length} more on the calendar
+            </p>
+          )}
+        </section>
+      )}
       <Caption birth={birth} today={today} lifeExpectancy={lifeExpectancy} />
     </>
   )
@@ -144,14 +183,23 @@ function StatsPage({
  * design holds from a letter page up to a wall poster.
  */
 export function PrintSheets(props: Props) {
-  const { birth, today, stats, lifeExpectancy, showStageColors, options } =
-    props
+  const {
+    birth,
+    today,
+    stats,
+    lifeExpectancy,
+    showStageColors,
+    options,
+    milestones,
+  } = props
+  const marks = milestonesByWeek(birth, milestones, stats.years)
   const grid = (
     <div className="sheet-grid">
       <StaticLifeGrid
         years={stats.years}
         current={stats.position}
         showStageColors={showStageColors}
+        milestones={marks}
         ariaLabel={
           props.preview
             ? undefined
@@ -185,6 +233,7 @@ export function PrintSheets(props: Props) {
             stats={stats}
             lifeExpectancy={lifeExpectancy}
             showStageColors={showStageColors}
+            milestones={milestones}
           />
         </section>
       </>

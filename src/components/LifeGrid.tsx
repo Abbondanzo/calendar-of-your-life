@@ -8,6 +8,7 @@ import {
   type LifePosition,
 } from '../lib/life'
 import { formatDate } from '../lib/format'
+import type { Milestone } from '../lib/milestones'
 import { toContent } from '../lib/viewport'
 import { useZoomPan } from '../hooks/useZoomPan'
 
@@ -31,6 +32,8 @@ interface Props {
   current: LifePosition
   showStageColors: boolean
   ariaLabel: string
+  /** Milestones keyed by grid index, from `milestonesByWeek` */
+  milestones: Map<number, Milestone[]>
 }
 
 const cx = (week: number) => LEFT + week * STEP + STEP / 2
@@ -238,17 +241,61 @@ function CurrentWeek({
   )
 }
 
+/** Five-point star centered on (x, y). */
+function starPoints(x: number, y: number, outer: number) {
+  const inner = outer * 0.5
+  const points = []
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 ? inner : outer
+    const angle = -Math.PI / 2 + (i * Math.PI) / 5
+    points.push(
+      `${(x + r * Math.cos(angle)).toFixed(2)},${(y + r * Math.sin(angle)).toFixed(2)}`,
+    )
+  }
+  return points.join(' ')
+}
+
+/**
+ * A star on every week with a milestone: solid once lived, outlined while
+ * it's still ahead.
+ */
+const MilestoneMarks = memo(function MilestoneMarks({
+  milestones,
+  currentIndex,
+}: {
+  milestones: Map<number, Milestone[]>
+  currentIndex: number
+}) {
+  return (
+    <g className="milestones">
+      {[...milestones.keys()].map((index) => {
+        const age = Math.floor(index / WEEKS_PER_YEAR)
+        const week = index % WEEKS_PER_YEAR
+        return (
+          <polygon
+            key={index}
+            className={`milestone${index <= currentIndex ? ' past' : ''}`}
+            points={starPoints(cx(week), cy(age) + 0.8, RADIUS + 4)}
+          />
+        )
+      })}
+    </g>
+  )
+})
+
 /** A non-interactive grid that scales to fit its box, used for print. */
 export function StaticLifeGrid({
   years,
   current,
   showStageColors,
   ariaLabel,
+  milestones,
 }: {
   years: number
   current: LifePosition
   showStageColors: boolean
   ariaLabel?: string
+  milestones: Map<number, Milestone[]>
 }) {
   const { width, height } = posterSize(years)
   return (
@@ -265,6 +312,7 @@ export function StaticLifeGrid({
         showStageColors={showStageColors}
       />
       {current.age < years && <CurrentWeek current={current} pulse={false} />}
+      <MilestoneMarks milestones={milestones} currentIndex={current.index} />
     </svg>
   )
 }
@@ -280,6 +328,7 @@ export function LifeGrid({
   current,
   showStageColors,
   ariaLabel,
+  milestones,
 }: Props) {
   const [selected, setSelected] = useState<Cell | null>(null)
 
@@ -350,6 +399,11 @@ export function LifeGrid({
         <span>
           {formatDate(start)} – {formatDate(end)}
         </span>
+        {milestones.get(index)?.map((m) => (
+          <span key={m.id} className="tooltip-milestone">
+            ★ {m.label}
+          </span>
+        ))}
         <em>{status}</em>
       </div>
     )
@@ -377,6 +431,10 @@ export function LifeGrid({
               showStageColors={showStageColors}
             />
             {current.age < years && <CurrentWeek current={current} pulse />}
+            <MilestoneMarks
+              milestones={milestones}
+              currentIndex={current.index}
+            />
             {selected && (
               <circle
                 className="selected-ring"

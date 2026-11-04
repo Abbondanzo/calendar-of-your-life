@@ -17,6 +17,7 @@ A web application based on Kurzgesagt's [Calendar of Your Life Infographic](http
 - Rows are colored by life stage (childhood, adolescence, early/middle/mature/late adulthood), with a toggle for a monochrome view.
 - Pick a life expectancy of 70, 80, 90 or 100 years.
 - Hover any week to see its dates and age.
+- Star milestones: the weeks that mattered, or ones you're looking forward to. They show on the grid, in the tooltip and on the printed stats page.
 - Press Ctrl/⌘+P to print it as a one-page poster, a calendar page plus a stats page, or just the grid, on anything from letter/A4 paper to a 24 × 36 in poster (or save as PDF for a print shop).
 - Light and dark themes: follows your system setting by default, or pick one.
 

@@ -4,6 +4,7 @@ import {
   normalizePrintOptions,
   type PrintOptions,
 } from './print'
+import { normalizeMilestones, type Milestone } from './milestones'
 
 export type Theme = 'system' | 'light' | 'dark'
 
@@ -19,6 +20,7 @@ export interface Settings {
   showStageColors: boolean
   theme: Theme
   print: PrintOptions
+  milestones: Milestone[]
 }
 
 const KEY = 'calendar-of-your-life:v1'
@@ -29,6 +31,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showStageColors: true,
   theme: 'system',
   print: DEFAULT_PRINT_OPTIONS,
+  milestones: [],
 }
 
 function load(): Settings {
@@ -43,6 +46,7 @@ function load(): Settings {
         ? (saved.theme as Theme)
         : DEFAULT_SETTINGS.theme,
       print: normalizePrintOptions(saved.print),
+      milestones: normalizeMilestones(saved.milestones),
     }
   } catch {
     return DEFAULT_SETTINGS

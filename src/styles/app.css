@@ -541,6 +541,152 @@ a {
   }
 }
 
+/* ---------- Milestones ---------- */
+
+.milestone {
+  fill: var(--surface);
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.milestone.past {
+  fill: var(--ink);
+  stroke: var(--surface);
+  stroke-width: 1.6;
+  paint-order: stroke;
+}
+
+.tooltip-milestone {
+  font-weight: 800;
+}
+
+.milestones-panel {
+  max-width: 760px;
+  margin: 3rem auto 0;
+}
+.section-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.section-lede {
+  margin: 0.4rem 0 1.25rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.milestone-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.field.grow {
+  flex: 1 1 240px;
+}
+.field input {
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  /* 16px keeps iOS Safari from zooming the page when the field is focused */
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.field input::placeholder {
+  color: var(--muted);
+  font-weight: 500;
+}
+.field input[aria-invalid='true'] {
+  border-color: var(--accent);
+}
+.button.small {
+  height: 2.75rem;
+  padding: 0 1.5rem;
+  font-size: 0.85rem;
+}
+.milestones-panel .error {
+  margin-top: 0.4rem;
+}
+
+.milestone-list {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.milestone-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.25rem;
+  border-bottom: 1px solid var(--line);
+}
+.milestone-star {
+  flex: none;
+  width: 1.25rem;
+  font-size: 1.15rem;
+  line-height: 1;
+  text-align: center;
+  color: var(--ink);
+}
+.milestone-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.milestone-text strong {
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.milestone-text small {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.milestone-list li.ahead .milestone-text strong {
+  font-weight: 700;
+}
+.icon-button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.icon-button:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+
 /* ---------- Print sheets ----------
  * A sheet is one printed page. Its size comes from --sheet-width/height (set
  * from the chosen paper, or by the preview), and everything inside is sized
@@ -554,6 +700,7 @@ a {
   --line: #e4ddd0;
   --accent: #e5402f;
   --neutral: #1e1f1c;
+  --surface: #ffffff;
   /* 1% of the sheet's short side. Plain lengths, not container query units,
      so text is laid out and printed at exactly the same size. */
   --u: calc(min(var(--sheet-width), var(--sheet-height)) / 100);
@@ -718,7 +865,7 @@ a {
 .sheet-stats-page.is-landscape {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto auto auto 1fr auto;
   column-gap: calc(5 * var(--u));
   row-gap: calc(3 * var(--u));
 }
@@ -739,8 +886,12 @@ a {
   grid-column: 2;
   grid-row: 2 / 4;
 }
-.sheet-stats-page.is-landscape .sheet-caption {
+.sheet-stats-page.is-landscape .sheet-milestones {
+  grid-column: 2;
   grid-row: 4;
+}
+.sheet-stats-page.is-landscape .sheet-caption {
+  grid-row: 5;
   align-self: end;
 }
 
@@ -795,6 +946,74 @@ a {
   font-weight: 800;
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+.sheet-milestones {
+  text-align: left;
+}
+/* Make room for the milestones on the stats page */
+.sheet-stats-page:has(.sheet-milestones) {
+  gap: calc(2.6 * var(--u));
+}
+.sheet-stats-page:has(.sheet-milestones) .sheet-stats > div {
+  padding: calc(1.8 * var(--u)) var(--u);
+}
+.sheet-stats-page:has(.sheet-milestones) .sheet-stats dd {
+  font-size: calc(6 * var(--u));
+}
+.sheet-stats-page:has(.sheet-milestones) .sheet-facts > div {
+  padding: calc(1.3 * var(--u)) calc(0.5 * var(--u));
+}
+.sheet-stats-page:has(.sheet-milestones) .sheet-stages ul {
+  gap: calc(1.8 * var(--u));
+}
+.sheet-milestones h2 {
+  margin: 0 0 calc(2 * var(--u));
+  font-size: calc(2.2 * var(--u));
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.sheet-milestones ol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(1.4 * var(--u)) calc(3 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sheet-milestones li {
+  display: grid;
+  grid-template-columns: calc(2.6 * var(--u)) 1fr;
+  column-gap: calc(1 * var(--u));
+  align-items: baseline;
+}
+.sheet-milestones .milestone-star {
+  grid-row: span 2;
+  width: auto;
+  font-size: calc(2 * var(--u));
+}
+.sheet-milestones li:not(.past) .milestone-star {
+  -webkit-text-stroke: calc(0.15 * var(--u)) var(--ink);
+  color: transparent;
+}
+.milestone-label {
+  font-size: calc(1.9 * var(--u));
+  font-weight: 900;
+  line-height: 1.2;
+}
+.milestone-when {
+  font-size: calc(1.35 * var(--u));
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sheet-more {
+  margin: calc(1.5 * var(--u)) 0 0;
+  font-size: calc(1.35 * var(--u));
+  font-weight: 700;
+  color: var(--muted);
 }
 
 .sheet-stats-page .sheet-caption {
