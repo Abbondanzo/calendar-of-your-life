@@ -17,6 +17,11 @@ const LEFT = 64
 const TOP = 64
 const RIGHT = 64
 const BOTTOM = 16
+// The axis arrows sit the same distance from the grid on both axes, with the
+// same gap between each arrow and its title.
+const ARROW_GAP = 36
+const TITLE_GAP = 10
+const ARROW_LENGTH = 260
 
 interface Props {
   birth: Date
@@ -97,11 +102,16 @@ const Poster = memo(function Poster({
 
   return (
     <>
-      {/* Top: weeks */}
-      <text className="axis-title" x={LEFT + STEP / 2 - 4} y={18}>
+      {/* Top: weeks. The title sits above the arrow, its baseline TITLE_GAP away. */}
+      <text className="axis-title" x={LEFT + 2} y={TOP - ARROW_GAP - TITLE_GAP}>
         Weeks of your life
       </text>
-      <Arrow x1={LEFT + 2} y1={28} x2={LEFT + 260} y2={28} />
+      <Arrow
+        x1={LEFT + 2}
+        y1={TOP - ARROW_GAP}
+        x2={LEFT + ARROW_LENGTH}
+        y2={TOP - ARROW_GAP}
+      />
       {weekLabels.map((w) => (
         <text
           key={w}
@@ -114,12 +124,18 @@ const Poster = memo(function Poster({
         </text>
       ))}
 
-      {/* Left: years */}
-      <g transform={`translate(18 ${TOP + 2}) rotate(90)`}>
-        <text className="axis-title" x={0} y={-4}>
+      {/* Left: years. Rotated 90°, so local +y points away from the grid and the
+          title hangs TITLE_GAP outside the arrow, mirroring the top axis. */}
+      <g transform={`translate(${LEFT - ARROW_GAP} ${TOP}) rotate(90)`}>
+        <Arrow x1={2} y1={0} x2={ARROW_LENGTH} y2={0} />
+        <text
+          className="axis-title"
+          x={2}
+          y={TITLE_GAP}
+          dominantBaseline="hanging"
+        >
           Years of your life
         </text>
-        <Arrow x1={0} y1={-14} x2={260} y2={-14} />
       </g>
       {yearLabels.map((age) => (
         <text
