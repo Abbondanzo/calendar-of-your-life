@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { lifeStats } from '../lib/life'
 import { THEMES, type Settings, type Theme } from '../lib/storage'
@@ -36,7 +36,7 @@ function useToday() {
 
 /**
  * Whether the print-only pages should be in the DOM. They're mounted just
- * before printing (from our button or the browser's own Print command) so the
+ * before printing (from the print dialog or the browser's own Print menu) so the
  * extra copy of the grid costs nothing the rest of the time.
  */
 function usePrinting() {
@@ -58,6 +58,31 @@ function usePrinting() {
   return [printing, print] as const
 }
 
+/**
+ * Opens the print options dialog in place of the browser's print dialog when
+ * the reader presses Ctrl/⌘+P. Printing from the browser menu skips it and
+ * uses the last saved options.
+ */
+function usePrintShortcut(open: () => void, isOpen: boolean) {
+  useEffect(() => {
+    // While our dialog is open, the shortcut prints as usual with its options
+    if (isOpen) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        !event.altKey &&
+        !event.shiftKey &&
+        event.key.toLowerCase() === 'p'
+      ) {
+        event.preventDefault()
+        open()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [open, isOpen])
+}
+
 export function Calendar({ birth, settings, onChange }: Props) {
   const today = useToday()
   const stats = lifeStats(birth, today, settings.lifeExpectancy)
@@ -65,6 +90,8 @@ export function Calendar({ birth, settings, onChange }: Props) {
   const { lifeExpectancy, showStageColors, print: printOptions } = settings
   const [printing, print] = usePrinting()
   const [dialogOpen, setDialogOpen] = useState(false)
+  const openDialog = useCallback(() => setDialogOpen(true), [])
+  usePrintShortcut(openDialog, dialogOpen)
 
   const sheetProps = { birth, today, stats, lifeExpectancy, showStageColors }
   const updatePrint = (patch: Partial<PrintOptions>) =>
@@ -148,13 +175,6 @@ export function Calendar({ birth, settings, onChange }: Props) {
               onClick={() => onChange({ birthday: null })}
             >
               Change birthdate
-            </button>
-            <button
-              type="button"
-              className="button ghost"
-              onClick={() => setDialogOpen(true)}
-            >
-              Print
             </button>
           </div>
         </header>
