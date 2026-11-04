@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { lifeStats } from '../lib/life'
+import { lifePosition, lifeStats } from '../lib/life'
+import {
+  estimatedYears,
+  expectedAge,
+  guessCountry,
+  loadLifeTables,
+  type LifeTables,
+} from '../lib/expectancy'
+import { EstimateControls } from './EstimateControls'
 import { THEMES, type Settings, type Theme } from '../lib/storage'
 import { formatNumber } from '../lib/format'
 import { printCss, type PrintOptions } from '../lib/print'
@@ -83,11 +91,55 @@ function usePrintShortcut(open: () => void, isOpen: boolean) {
   }, [open, isOpen])
 }
 
+/** Loads the UN life tables once a personal estimate is turned on. */
+function useLifeTables(wanted: boolean) {
+  const [tables, setTables] = useState<LifeTables | null>(null)
+  useEffect(() => {
+    if (!wanted || tables) return
+    let live = true
+    loadLifeTables().then((loaded) => live && setTables(loaded))
+    return () => {
+      live = false
+    }
+  }, [wanted, tables])
+  return tables
+}
+
 export function Calendar({ birth, settings, onChange }: Props) {
   const today = useToday()
-  const stats = lifeStats(birth, today, settings.lifeExpectancy)
+  const { estimate } = settings
+  const tables = useLifeTables(estimate !== null)
+  const age = lifePosition(birth, today).age
+  const expected =
+    estimate && tables ? expectedAge(tables, estimate, age) : null
+  // With an estimate the grid follows it; until the tables load, the last
+  // saved estimate keeps the grid steady
+  const lifeExpectancy =
+    expected !== null ? estimatedYears(expected, age) : settings.lifeExpectancy
+  useEffect(() => {
+    if (lifeExpectancy !== settings.lifeExpectancy) onChange({ lifeExpectancy })
+  }, [lifeExpectancy, settings.lifeExpectancy, onChange])
+
+  const stats = lifeStats(birth, today, lifeExpectancy)
   const { position, years, totalWeeks, weeksLived, weeksLeft, percent } = stats
-  const { lifeExpectancy, showStageColors, print: printOptions } = settings
+  const { showStageColors, print: printOptions } = settings
+
+  const chooseExpectancy = (value: string) => {
+    if (value !== 'estimate') {
+      onChange({ lifeExpectancy: Number(value), estimate: null })
+      return
+    }
+    loadLifeTables().then((loaded) =>
+      onChange({
+        estimate: {
+          country:
+            guessCountry(navigator.languages, (c) => c in loaded.tables) ??
+            'US',
+          sex: 'any',
+        },
+      }),
+    )
+  }
   const [printing, print] = usePrinting()
   const [dialogOpen, setDialogOpen] = useState(false)
   const openDialog = useCallback(() => setDialogOpen(true), [])
@@ -134,16 +186,22 @@ export function Calendar({ birth, settings, onChange }: Props) {
             <label className="control">
               <span>Live to</span>
               <select
-                value={lifeExpectancy}
-                onChange={(e) =>
-                  onChange({ lifeExpectancy: Number(e.target.value) })
-                }
+                value={estimate ? 'estimate' : lifeExpectancy}
+                onChange={(e) => chooseExpectancy(e.target.value)}
               >
+                {!estimate && !EXPECTANCY_OPTIONS.includes(lifeExpectancy) && (
+                  <option value={lifeExpectancy}>{lifeExpectancy} years</option>
+                )}
                 {EXPECTANCY_OPTIONS.map((years) => (
                   <option key={years} value={years}>
                     {years} years
                   </option>
                 ))}
+                <option value="estimate">
+                  {estimate
+                    ? `My estimate (${lifeExpectancy})`
+                    : 'My estimate…'}
+                </option>
               </select>
             </label>
             <label className="control checkbox">
@@ -177,6 +235,15 @@ export function Calendar({ birth, settings, onChange }: Props) {
               Change birthdate
             </button>
           </div>
+          {estimate && (
+            <EstimateControls
+              tables={tables}
+              estimate={estimate}
+              age={age}
+              expected={expected}
+              onChange={(next) => onChange({ estimate: next })}
+            />
+          )}
         </header>
 
         <main>

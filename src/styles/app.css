@@ -283,6 +283,37 @@ a {
   accent-color: var(--accent);
 }
 
+/* ---------- Personal estimate ---------- */
+
+.estimate {
+  max-width: 640px;
+  margin: 1.25rem auto 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.estimate-fields {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+}
+.estimate-fields select {
+  max-width: 16rem;
+}
+.estimate-note {
+  margin: 0.85rem 0 0;
+  font-size: 0.9rem;
+  text-wrap: pretty;
+}
+.estimate-note strong {
+  font-weight: 900;
+}
+.estimate-source {
+  color: var(--muted);
+}
+
 /* ---------- Grid ---------- */
 
 .grid-shell {
