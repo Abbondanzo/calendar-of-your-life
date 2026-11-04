@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react'
+import {
+  DEFAULT_PRINT_OPTIONS,
+  normalizePrintOptions,
+  type PrintOptions,
+} from './print'
 
 export interface Settings {
   birthday: string | null
   lifeExpectancy: number
   showStageColors: boolean
+  print: PrintOptions
 }
 
 const KEY = 'calendar-of-your-life:v1'
@@ -12,13 +18,19 @@ export const DEFAULT_SETTINGS: Settings = {
   birthday: null,
   lifeExpectancy: 90,
   showStageColors: true,
+  print: DEFAULT_PRINT_OPTIONS,
 }
 
 function load(): Settings {
   try {
     const raw = window.localStorage.getItem(KEY)
     if (!raw) return DEFAULT_SETTINGS
-    return { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<Settings>) }
+    const saved = JSON.parse(raw) as Partial<Settings>
+    return {
+      ...DEFAULT_SETTINGS,
+      ...saved,
+      print: normalizePrintOptions(saved.print),
+    }
   } catch {
     return DEFAULT_SETTINGS
   }

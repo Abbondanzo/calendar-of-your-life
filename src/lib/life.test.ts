@@ -3,8 +3,10 @@ import {
   ageOn,
   birthdayAt,
   lifePosition,
+  lifeStats,
   parseISODate,
   stageForAge,
+  stageProgress,
   toISODate,
   visibleStages,
   weekRange,
@@ -106,5 +108,37 @@ describe('stages', () => {
       end: 89,
     })
     expect(visibleStages(70).map((s) => s.name)).not.toContain('Late Adulthood')
+  })
+})
+
+describe('lifeStats', () => {
+  it('counts weeks lived and left against the expectancy', () => {
+    const stats = lifeStats(d('2000-01-01'), d('2010-01-15'), 80)
+    expect(stats.weeksLived).toBe(10 * 52 + 2)
+    expect(stats.weeksLeft).toBe(80 * 52 - stats.weeksLived - 1)
+    expect(stats.years).toBe(80)
+    expect(stats.percent).toBeCloseTo((522 / 4160) * 100)
+  })
+
+  it('extends the grid past the expectancy', () => {
+    const stats = lifeStats(d('1930-06-01'), d('2010-07-01'), 70)
+    expect(stats.years).toBe(81)
+    expect(stats.weeksLeft).toBe(0)
+    expect(stats.percent).toBe(100)
+  })
+})
+
+describe('stageProgress', () => {
+  it('splits lived weeks across stages', () => {
+    const stages = stageProgress(90, 15 * 52 + 3)
+    expect(stages.map((s) => s.weeksLived)).toEqual([
+      13 * 52,
+      2 * 52 + 3,
+      0,
+      0,
+      0,
+      0,
+    ])
+    expect(stages.at(-1)).toMatchObject({ end: 89, totalWeeks: 10 * 52 })
   })
 })

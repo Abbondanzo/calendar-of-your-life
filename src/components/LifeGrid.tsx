@@ -65,7 +65,7 @@ function Arrow({
 }
 
 /** All the static parts of the poster. Memoized so hovering doesn't re-render 5,000 circles. */
-const Poster = memo(function Poster({
+export const Poster = memo(function Poster({
   years,
   currentIndex,
   showStageColors,
@@ -199,6 +199,76 @@ const Poster = memo(function Poster({
   )
 })
 
+/** Size of the whole poster in SVG user units. */
+export function posterSize(years: number) {
+  return {
+    width: LEFT + WEEKS_PER_YEAR * STEP + RIGHT,
+    height: TOP + years * STEP + BOTTOM,
+  }
+}
+
+/** The current week, drawn above the rest of the grid. */
+function CurrentWeek({
+  current,
+  pulse,
+}: {
+  current: LifePosition
+  pulse: boolean
+}) {
+  return (
+    <g className="current">
+      {pulse && (
+        <circle
+          className="current-pulse"
+          cx={cx(current.week)}
+          cy={cy(current.age)}
+          r={RADIUS}
+        />
+      )}
+      <circle
+        className="current-cell"
+        cx={cx(current.week)}
+        cy={cy(current.age)}
+        r={RADIUS}
+        fill="var(--accent)"
+        stroke="var(--accent)"
+        strokeWidth={STROKE}
+      />
+    </g>
+  )
+}
+
+/** A non-interactive grid that scales to fit its box, used for print. */
+export function StaticLifeGrid({
+  years,
+  current,
+  showStageColors,
+  ariaLabel,
+}: {
+  years: number
+  current: LifePosition
+  showStageColors: boolean
+  ariaLabel?: string
+}) {
+  const { width, height } = posterSize(years)
+  return (
+    <svg
+      className="life-grid static"
+      viewBox={`0 0 ${width} ${height}`}
+      role={ariaLabel ? 'img' : undefined}
+      aria-label={ariaLabel}
+      aria-hidden={ariaLabel ? undefined : true}
+    >
+      <Poster
+        years={years}
+        currentIndex={current.index}
+        showStageColors={showStageColors}
+      />
+      {current.age < years && <CurrentWeek current={current} pulse={false} />}
+    </svg>
+  )
+}
+
 interface Cell {
   age: number
   week: number
@@ -213,8 +283,7 @@ export function LifeGrid({
 }: Props) {
   const [selected, setSelected] = useState<Cell | null>(null)
 
-  const width = LEFT + WEEKS_PER_YEAR * STEP + RIGHT
-  const height = TOP + years * STEP + BOTTOM
+  const { width, height } = posterSize(years)
 
   const cellAt = (px: number, py: number): Cell | null => {
     const point = toContent(zoom.view, px, py)
@@ -307,24 +376,7 @@ export function LifeGrid({
               currentIndex={current.index}
               showStageColors={showStageColors}
             />
-            {current.age < years && (
-              <g className="current">
-                <circle
-                  className="current-pulse"
-                  cx={cx(current.week)}
-                  cy={cy(current.age)}
-                  r={RADIUS}
-                />
-                <circle
-                  cx={cx(current.week)}
-                  cy={cy(current.age)}
-                  r={RADIUS}
-                  fill="var(--accent)"
-                  stroke="var(--accent)"
-                  strokeWidth={STROKE}
-                />
-              </g>
-            )}
+            {current.age < years && <CurrentWeek current={current} pulse />}
             {selected && (
               <circle
                 className="selected-ring"
