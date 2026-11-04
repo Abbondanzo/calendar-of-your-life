@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { lifeStats } from '../lib/life'
 import { THEMES, type Settings, type Theme } from '../lib/storage'
@@ -7,6 +7,8 @@ import { printCss, type PrintOptions } from '../lib/print'
 import { LifeGrid } from './LifeGrid'
 import { PrintDialog } from './PrintDialog'
 import { PrintSheets } from './PrintSheets'
+import { Milestones } from './Milestones'
+import { milestonesByWeek } from '../lib/milestones'
 
 interface Props {
   birth: Date
@@ -93,7 +95,20 @@ export function Calendar({ birth, settings, onChange }: Props) {
   const openDialog = useCallback(() => setDialogOpen(true), [])
   usePrintShortcut(openDialog, dialogOpen)
 
-  const sheetProps = { birth, today, stats, lifeExpectancy, showStageColors }
+  const { milestones } = settings
+  const marks = useMemo(
+    () => milestonesByWeek(birth, milestones, years),
+    [birth, milestones, years],
+  )
+
+  const sheetProps = {
+    birth,
+    today,
+    stats,
+    lifeExpectancy,
+    showStageColors,
+    milestones,
+  }
   const updatePrint = (patch: Partial<PrintOptions>) =>
     onChange({ print: { ...printOptions, ...patch } })
 
@@ -185,7 +200,16 @@ export function Calendar({ birth, settings, onChange }: Props) {
             years={years}
             current={position}
             showStageColors={showStageColors}
+            milestones={marks}
             ariaLabel={`A grid of ${formatNumber(totalWeeks)} weeks, one row per year. ${formatNumber(weeksLived)} weeks are filled in.`}
+          />
+          <Milestones
+            birth={birth}
+            today={today}
+            years={years}
+            currentIndex={position.index}
+            milestones={milestones}
+            onChange={(next) => onChange({ milestones: next })}
           />
         </main>
 
