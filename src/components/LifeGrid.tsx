@@ -1,4 +1,4 @@
-import { memo, useRef, useState, type PointerEvent } from 'react'
+import { memo, useState, type PointerEvent } from 'react'
 import {
   NEUTRAL_COLOR,
   WEEKS_PER_YEAR,
@@ -8,6 +8,8 @@ import {
   type LifePosition,
 } from '../lib/life'
 import { formatDate } from '../lib/format'
+import { toContent } from '../lib/viewport'
+import { useZoomPan } from '../hooks/useZoomPan'
 
 // Geometry, in SVG user units. The SVG scales to its container via viewBox.
 const STEP = 20
@@ -17,6 +19,11 @@ const LEFT = 64
 const TOP = 64
 const RIGHT = 64
 const BOTTOM = 16
+// The axis arrows sit the same distance from the grid on both axes, with the
+// same gap between each arrow and its title.
+const ARROW_GAP = 36
+const TITLE_GAP = 10
+const ARROW_LENGTH = 260
 
 interface Props {
   birth: Date
@@ -97,11 +104,16 @@ const Poster = memo(function Poster({
 
   return (
     <>
-      {/* Top: weeks */}
-      <text className="axis-title" x={LEFT + STEP / 2 - 4} y={18}>
+      {/* Top: weeks. The title sits above the arrow, its baseline TITLE_GAP away. */}
+      <text className="axis-title" x={LEFT + 2} y={TOP - ARROW_GAP - TITLE_GAP}>
         Weeks of your life
       </text>
-      <Arrow x1={LEFT + 2} y1={28} x2={LEFT + 260} y2={28} />
+      <Arrow
+        x1={LEFT + 2}
+        y1={TOP - ARROW_GAP}
+        x2={LEFT + ARROW_LENGTH}
+        y2={TOP - ARROW_GAP}
+      />
       {weekLabels.map((w) => (
         <text
           key={w}
@@ -114,12 +126,18 @@ const Poster = memo(function Poster({
         </text>
       ))}
 
-      {/* Left: years */}
-      <g transform={`translate(18 ${TOP + 2}) rotate(90)`}>
-        <text className="axis-title" x={0} y={-4}>
+      {/* Left: years. Rotated 90°, so local +y points away from the grid and the
+          title hangs TITLE_GAP outside the arrow, mirroring the top axis. */}
+      <g transform={`translate(${LEFT - ARROW_GAP} ${TOP}) rotate(90)`}>
+        <Arrow x1={2} y1={0} x2={ARROW_LENGTH} y2={0} />
+        <text
+          className="axis-title"
+          x={2}
+          y={TITLE_GAP}
+          dominantBaseline="hanging"
+        >
           Years of your life
         </text>
-        <Arrow x1={0} y1={-14} x2={260} y2={-14} />
       </g>
       {yearLabels.map((age) => (
         <text
@@ -181,6 +199,11 @@ const Poster = memo(function Poster({
   )
 })
 
+interface Cell {
+  age: number
+  week: number
+}
+
 export function LifeGrid({
   birth,
   years,
@@ -188,57 +211,72 @@ export function LifeGrid({
   showStageColors,
   ariaLabel,
 }: Props) {
-  const svgRef = useRef<SVGSVGElement>(null)
-  const [hover, setHover] = useState<{
-    age: number
-    week: number
-    x: number
-    y: number
-  } | null>(null)
+  const [selected, setSelected] = useState<Cell | null>(null)
 
   const width = LEFT + WEEKS_PER_YEAR * STEP + RIGHT
   const height = TOP + years * STEP + BOTTOM
 
-  const handlePointerMove = (event: PointerEvent<SVGSVGElement>) => {
-    const svg = svgRef.current
-    const matrix = svg?.getScreenCTM()
-    if (!svg || !matrix) return
-    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
-      matrix.inverse(),
-    )
+  const cellAt = (px: number, py: number): Cell | null => {
+    const point = toContent(zoom.view, px, py)
     const week = Math.floor((point.x - LEFT) / STEP)
     const age = Math.floor((point.y - TOP) / STEP)
-    if (week < 0 || week >= WEEKS_PER_YEAR || age < 0 || age >= years) {
-      setHover(null)
+    if (week < 0 || week >= WEEKS_PER_YEAR || age < 0 || age >= years)
+      return null
+    return { age, week }
+  }
+
+  const zoom = useZoomPan<HTMLDivElement>({
+    content: { width, height },
+    // Touch has no hover, so a tap selects a week (and a tap elsewhere clears it)
+    onTap: (x, y) => setSelected(cellAt(x, y)),
+  })
+  const { view } = zoom
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    zoom.handlers.onPointerMove(event)
+    if (event.pointerType !== 'mouse') return
+    if (event.buttons) {
+      setSelected(null) // hide while dragging
       return
     }
-    const rect = svg.getBoundingClientRect()
-    setHover({
-      age,
-      week,
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    })
+    const rect = event.currentTarget.getBoundingClientRect()
+    setSelected(cellAt(event.clientX - rect.left, event.clientY - rect.top))
+  }
+
+  const handlePointerLeave = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'mouse') setSelected(null)
   }
 
   let tooltip = null
-  if (hover) {
-    const [start, end] = weekRange(birth, hover.age, hover.week)
-    const index = hover.age * WEEKS_PER_YEAR + hover.week
+  if (selected && selected.age < years) {
+    const [start, end] = weekRange(birth, selected.age, selected.week)
+    const index = selected.age * WEEKS_PER_YEAR + selected.week
     const status =
       index < current.index
         ? 'Lived'
         : index === current.index
           ? 'This week'
           : 'Ahead of you'
+    // Anchor to the cell, flipping so the tooltip stays inside the viewport
+    const sx = view.x + cx(selected.week) * view.scale
+    const sy = view.y + cy(selected.age) * view.scale
+    const gap = RADIUS * view.scale + 8
+    const viewportWidth = zoom.ref.current?.clientWidth ?? 0
+    const align =
+      sx < viewportWidth * 0.3
+        ? 'start'
+        : sx > viewportWidth * 0.7
+          ? 'end'
+          : 'center'
+    const below = sy < 90
     tooltip = (
       <div
-        className="tooltip"
-        style={{ left: hover.x, top: hover.y }}
+        className={`tooltip align-${align} ${below ? 'below' : 'above'}`}
+        style={{ left: sx, top: below ? sy + gap : sy - gap }}
         role="status"
       >
         <strong>
-          Age {hover.age}, week {hover.week + 1}
+          Age {selected.age}, week {selected.week + 1}
         </strong>
         <span>
           {formatDate(start)} – {formatDate(end)}
@@ -249,41 +287,98 @@ export function LifeGrid({
   }
 
   return (
-    <div className="grid-wrapper">
-      <svg
-        ref={svgRef}
-        className="life-grid"
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label={ariaLabel}
+    <div className="grid-shell">
+      <div
+        ref={zoom.ref}
+        className={`grid-viewport${zoom.zoomed ? ' is-zoomed' : ''}${zoom.dragging ? ' is-dragging' : ''}`}
+        style={{ aspectRatio: `${width} / ${height}` }}
+        tabIndex={0}
+        role="group"
+        aria-roledescription="zoomable calendar"
+        aria-label="Calendar of your life. Use plus and minus to zoom, arrow keys to pan, 0 to reset."
+        {...zoom.handlers}
         onPointerMove={handlePointerMove}
-        onPointerLeave={() => setHover(null)}
+        onPointerLeave={handlePointerLeave}
       >
-        <Poster
-          years={years}
-          currentIndex={current.index}
-          showStageColors={showStageColors}
-        />
-        {current.age < years && (
-          <g className="current">
-            <circle
-              className="current-pulse"
-              cx={cx(current.week)}
-              cy={cy(current.age)}
-              r={RADIUS}
+        <svg className="life-grid" role="img" aria-label={ariaLabel}>
+          <g transform={`translate(${view.x} ${view.y}) scale(${view.scale})`}>
+            <Poster
+              years={years}
+              currentIndex={current.index}
+              showStageColors={showStageColors}
             />
-            <circle
-              cx={cx(current.week)}
-              cy={cy(current.age)}
-              r={RADIUS}
-              fill="var(--accent)"
-              stroke="var(--accent)"
-              strokeWidth={STROKE}
-            />
+            {current.age < years && (
+              <g className="current">
+                <circle
+                  className="current-pulse"
+                  cx={cx(current.week)}
+                  cy={cy(current.age)}
+                  r={RADIUS}
+                />
+                <circle
+                  cx={cx(current.week)}
+                  cy={cy(current.age)}
+                  r={RADIUS}
+                  fill="var(--accent)"
+                  stroke="var(--accent)"
+                  strokeWidth={STROKE}
+                />
+              </g>
+            )}
+            {selected && (
+              <circle
+                className="selected-ring"
+                cx={cx(selected.week)}
+                cy={cy(selected.age)}
+                r={RADIUS + 3}
+              />
+            )}
           </g>
-        )}
-      </svg>
-      {tooltip}
+        </svg>
+        {tooltip}
+
+        <div
+          className="zoom-controls"
+          onPointerDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={zoom.zoomIn}
+            disabled={!zoom.canZoomIn}
+            aria-label="Zoom in"
+          >
+            +
+          </button>
+          <button
+            type="button"
+            onClick={zoom.zoomOut}
+            disabled={!zoom.zoomed}
+            aria-label="Zoom out"
+          >
+            −
+          </button>
+          <button
+            type="button"
+            onClick={zoom.reset}
+            disabled={!zoom.zoomed}
+            aria-label="Fit whole calendar"
+            title="Fit whole calendar"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <p className="zoom-hint">
+        <span className="hint-pointer">
+          Ctrl/⌘ + scroll or double-click to zoom · drag to pan
+        </span>
+        <span className="hint-touch">
+          Pinch or double-tap to zoom · tap a week for details
+        </span>
+      </p>
     </div>
   )
 }
