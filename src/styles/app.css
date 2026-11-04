@@ -228,6 +228,8 @@ a {
 }
 .control select {
   font: inherit;
+  /* 16px keeps iOS Safari from zooming the page when the select is focused */
+  font-size: 16px;
   font-weight: 700;
   text-transform: none;
   padding: 0.35em 0.5em;
@@ -244,18 +246,40 @@ a {
 
 /* ---------- Grid ---------- */
 
-.grid-wrapper {
-  position: relative;
-  max-width: 1000px;
+.grid-shell {
+  max-width: 1100px;
   margin: 0 auto;
+}
+
+.grid-viewport {
+  position: relative;
+  width: 100%;
+  /* aspect-ratio is set inline from the poster size; never taller than the screen */
+  max-height: calc(100svh - 24px);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  /* Let one finger scroll the page until the grid is zoomed in */
+  touch-action: pan-y;
+}
+.grid-viewport.is-zoomed {
+  touch-action: none;
+  cursor: grab;
+}
+.grid-viewport.is-dragging {
+  cursor: grabbing;
 }
 
 .life-grid {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   font-family: var(--font);
-  touch-action: manipulation;
 }
 
 .cell {
@@ -267,6 +291,13 @@ a {
 
 .hit-area {
   fill: transparent;
+}
+
+.selected-ring {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  pointer-events: none;
 }
 
 .current-pulse {
@@ -334,17 +365,29 @@ a {
 .tooltip {
   position: absolute;
   z-index: 1;
-  transform: translate(-50%, calc(-100% - 14px));
   pointer-events: none;
   display: flex;
   flex-direction: column;
-  min-width: max-content;
+  width: max-content;
+  max-width: calc(100% - 16px);
   padding: 0.5rem 0.75rem;
   background: var(--ink);
   color: var(--bg);
   font-size: 0.8rem;
   line-height: 1.35;
   box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
+  --tx: -50%;
+  --ty: -100%;
+  transform: translate(var(--tx), var(--ty));
+}
+.tooltip.align-start {
+  --tx: -12px;
+}
+.tooltip.align-end {
+  --tx: calc(-100% + 12px);
+}
+.tooltip.below {
+  --ty: 0;
 }
 .tooltip strong {
   font-weight: 900;
@@ -355,6 +398,71 @@ a {
   font-style: normal;
   color: #f5a99f;
   font-weight: 700;
+}
+
+.zoom-controls {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--ink);
+  background: var(--surface);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+}
+.zoom-controls button {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.zoom-controls button + button {
+  border-top: 2px solid var(--ink);
+}
+.zoom-controls button:hover:not(:disabled) {
+  background: var(--bg);
+}
+.zoom-controls button:disabled {
+  color: var(--line);
+  cursor: default;
+}
+.zoom-controls svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.zoom-hint {
+  margin: 0.75rem 0 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.hint-touch {
+  display: none;
+}
+@media (hover: none) and (pointer: coarse) {
+  .hint-pointer {
+    display: none;
+  }
+  .hint-touch {
+    display: inline;
+  }
 }
 
 .footer {
@@ -374,5 +482,22 @@ a {
   }
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 1.75rem;
+  }
+  .stats > div {
+    padding: 0.75rem 0.5rem;
+  }
+  .controls {
+    gap: 0.75rem 1rem;
+  }
+  .grid-viewport {
+    border-radius: 8px;
+  }
+  .zoom-controls {
+    right: 8px;
+    bottom: 8px;
+  }
+  .footer {
+    padding: 2rem 0 3rem;
   }
 }
