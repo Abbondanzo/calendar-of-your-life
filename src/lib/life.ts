@@ -127,3 +127,54 @@ export function visibleStages(years: number): Stage[] {
     end: Math.min(stage.end, years - 1),
   }))
 }
+
+export interface LifeStats {
+  position: LifePosition
+  /** Rows in the grid; never cuts off before the current week */
+  years: number
+  totalWeeks: number
+  weeksLived: number
+  weeksLeft: number
+  /** Share of the expected lifespan lived, 0–100 */
+  percent: number
+}
+
+export function lifeStats(
+  birth: Date,
+  today: Date,
+  lifeExpectancy: number,
+): LifeStats {
+  const position = lifePosition(birth, today)
+  const years = Math.max(lifeExpectancy, position.age + 1)
+  const expectedWeeks = lifeExpectancy * WEEKS_PER_YEAR
+  const weeksLived = position.index
+  return {
+    position,
+    years,
+    totalWeeks: years * WEEKS_PER_YEAR,
+    weeksLived,
+    weeksLeft: Math.max(0, expectedWeeks - weeksLived - 1),
+    percent: Math.min(100, (weeksLived / expectedWeeks) * 100),
+  }
+}
+
+export interface StageProgress extends Stage {
+  totalWeeks: number
+  weeksLived: number
+}
+
+/** How many weeks of each stage (clipped to the grid) have been lived. */
+export function stageProgress(
+  years: number,
+  currentIndex: number,
+): StageProgress[] {
+  return visibleStages(years).map((stage) => {
+    const totalWeeks = (stage.end - stage.start + 1) * WEEKS_PER_YEAR
+    const lived = currentIndex - stage.start * WEEKS_PER_YEAR
+    return {
+      ...stage,
+      totalWeeks,
+      weeksLived: Math.min(totalWeeks, Math.max(0, lived)),
+    }
+  })
+}

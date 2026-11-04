@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
-import { WEEKS_PER_YEAR, lifePosition } from '../lib/life'
+import { flushSync } from 'react-dom'
+import { lifeStats } from '../lib/life'
 import type { Settings } from '../lib/storage'
 import { formatNumber } from '../lib/format'
+import { printCss, type PrintOptions } from '../lib/print'
 import { LifeGrid } from './LifeGrid'
+import { PrintDialog } from './PrintDialog'
+import { PrintSheets } from './PrintSheets'
 
 interface Props {
   birth: Date
@@ -30,114 +34,163 @@ function useToday() {
   return today
 }
 
+/**
+ * Whether the print-only pages should be in the DOM. They're mounted just
+ * before printing (from our button or the browser's own Print command) so the
+ * extra copy of the grid costs nothing the rest of the time.
+ */
+function usePrinting() {
+  const [printing, setPrinting] = useState(false)
+  useEffect(() => {
+    const before = () => flushSync(() => setPrinting(true))
+    const after = () => setPrinting(false)
+    window.addEventListener('beforeprint', before)
+    window.addEventListener('afterprint', after)
+    return () => {
+      window.removeEventListener('beforeprint', before)
+      window.removeEventListener('afterprint', after)
+    }
+  }, [])
+  const print = () => {
+    flushSync(() => setPrinting(true))
+    window.print()
+  }
+  return [printing, print] as const
+}
+
 export function Calendar({ birth, settings, onChange }: Props) {
   const today = useToday()
-  const position = lifePosition(birth, today)
-  const { lifeExpectancy, showStageColors } = settings
+  const stats = lifeStats(birth, today, settings.lifeExpectancy)
+  const { position, years, totalWeeks, weeksLived, weeksLeft, percent } = stats
+  const { lifeExpectancy, showStageColors, print: printOptions } = settings
+  const [printing, print] = usePrinting()
+  const [dialogOpen, setDialogOpen] = useState(false)
 
-  // Never cut the grid off before the current week
-  const years = Math.max(lifeExpectancy, position.age + 1)
-  const totalWeeks = years * WEEKS_PER_YEAR
-  const weeksLived = position.index
-  const weeksLeft = Math.max(
-    0,
-    lifeExpectancy * WEEKS_PER_YEAR - weeksLived - 1,
-  )
-  const percent = Math.min(
-    100,
-    (weeksLived / (lifeExpectancy * WEEKS_PER_YEAR)) * 100,
-  )
+  const sheetProps = { birth, today, stats, lifeExpectancy, showStageColors }
+  const updatePrint = (patch: Partial<PrintOptions>) =>
+    onChange({ print: { ...printOptions, ...patch } })
 
   return (
-    <div className="calendar-page">
-      <header className="header">
-        <h1 className="title">Calendar of Your Life</h1>
-        <p className="tagline">
-          Time is limited and precious. How do you want to spend it?
-        </p>
-
-        <dl className="stats">
-          <div>
-            <dt>Weeks lived</dt>
-            <dd>{formatNumber(weeksLived)}</dd>
-          </div>
-          <div>
-            <dt>Weeks left</dt>
-            <dd>{formatNumber(weeksLeft)}</dd>
-          </div>
-          <div>
-            <dt>Life lived</dt>
-            <dd>{percent.toFixed(1)}%</dd>
-          </div>
-          <div>
-            <dt>Days lived</dt>
-            <dd>{formatNumber(position.daysLived)}</dd>
-          </div>
-        </dl>
-        {position.age >= lifeExpectancy && (
-          <p className="bonus">
-            You've outlived this calendar. Every week from here is a bonus.
+    <>
+      <div className="calendar-page">
+        <header className="header">
+          <h1 className="title">Calendar of Your Life</h1>
+          <p className="tagline">
+            Time is limited and precious. How do you want to spend it?
           </p>
-        )}
 
-        <div className="controls">
-          <label className="control">
-            <span>Live to</span>
-            <select
-              value={lifeExpectancy}
-              onChange={(e) =>
-                onChange({ lifeExpectancy: Number(e.target.value) })
-              }
+          <dl className="stats">
+            <div>
+              <dt>Weeks lived</dt>
+              <dd>{formatNumber(weeksLived)}</dd>
+            </div>
+            <div>
+              <dt>Weeks left</dt>
+              <dd>{formatNumber(weeksLeft)}</dd>
+            </div>
+            <div>
+              <dt>Life lived</dt>
+              <dd>{percent.toFixed(1)}%</dd>
+            </div>
+            <div>
+              <dt>Days lived</dt>
+              <dd>{formatNumber(position.daysLived)}</dd>
+            </div>
+          </dl>
+          {position.age >= lifeExpectancy && (
+            <p className="bonus">
+              You've outlived this calendar. Every week from here is a bonus.
+            </p>
+          )}
+
+          <div className="controls">
+            <label className="control">
+              <span>Live to</span>
+              <select
+                value={lifeExpectancy}
+                onChange={(e) =>
+                  onChange({ lifeExpectancy: Number(e.target.value) })
+                }
+              >
+                {EXPECTANCY_OPTIONS.map((years) => (
+                  <option key={years} value={years}>
+                    {years} years
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="control checkbox">
+              <input
+                type="checkbox"
+                checked={showStageColors}
+                onChange={(e) =>
+                  onChange({ showStageColors: e.target.checked })
+                }
+              />
+              <span>Stage colors</span>
+            </label>
+            <button
+              type="button"
+              className="button ghost"
+              onClick={() => onChange({ birthday: null })}
             >
-              {EXPECTANCY_OPTIONS.map((years) => (
-                <option key={years} value={years}>
-                  {years} years
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="control checkbox">
-            <input
-              type="checkbox"
-              checked={showStageColors}
-              onChange={(e) => onChange({ showStageColors: e.target.checked })}
-            />
-            <span>Stage colors</span>
-          </label>
-          <button
-            type="button"
-            className="button ghost"
-            onClick={() => onChange({ birthday: null })}
-          >
-            Change birthdate
-          </button>
+              Change birthdate
+            </button>
+            <button
+              type="button"
+              className="button ghost"
+              onClick={() => setDialogOpen(true)}
+            >
+              Print
+            </button>
+          </div>
+        </header>
+
+        <main>
+          <LifeGrid
+            birth={birth}
+            years={years}
+            current={position}
+            showStageColors={showStageColors}
+            ariaLabel={`A grid of ${formatNumber(totalWeeks)} weeks, one row per year. ${formatNumber(weeksLived)} weeks are filled in.`}
+          />
+        </main>
+
+        <footer className="footer">
+          <p>
+            Inspired by Kurzgesagt's Calendar of Your Life poster. If you enjoy
+            their work, consider{' '}
+            <a
+              href="https://kurzgesagt.org/patreon-2/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              supporting them on Patreon
+            </a>
+            .
+          </p>
+        </footer>
+      </div>
+
+      <PrintDialog
+        {...sheetProps}
+        open={dialogOpen}
+        options={printOptions}
+        onChange={updatePrint}
+        onStageColorsChange={(value) => onChange({ showStageColors: value })}
+        onClose={() => setDialogOpen(false)}
+        onPrint={() => {
+          flushSync(() => setDialogOpen(false))
+          print()
+        }}
+      />
+
+      {printing && (
+        <div className="print-root">
+          <style>{printCss(printOptions)}</style>
+          <PrintSheets {...sheetProps} options={printOptions} />
         </div>
-      </header>
-
-      <main>
-        <LifeGrid
-          birth={birth}
-          years={years}
-          current={position}
-          showStageColors={showStageColors}
-          ariaLabel={`A grid of ${formatNumber(totalWeeks)} weeks, one row per year. ${formatNumber(weeksLived)} weeks are filled in.`}
-        />
-      </main>
-
-      <footer className="footer">
-        <p>
-          Inspired by Kurzgesagt's Calendar of Your Life poster. If you enjoy
-          their work, consider{' '}
-          <a
-            href="https://kurzgesagt.org/patreon-2/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            supporting them on Patreon
-          </a>
-          .
-        </p>
-      </footer>
-    </div>
+      )}
+    </>
   )
 }

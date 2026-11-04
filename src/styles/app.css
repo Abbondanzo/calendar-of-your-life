@@ -501,3 +501,436 @@ a {
     padding: 2rem 0 3rem;
   }
 }
+
+/* ---------- Print sheets ----------
+ * A sheet is one printed page. Its size comes from --sheet-width/height (set
+ * from the chosen paper, or by the preview), and everything inside is sized
+ * in container units so the same layout works on letter paper or a poster.
+ */
+
+.sheet {
+  container-type: size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4cqmin;
+  width: var(--sheet-width);
+  height: var(--sheet-height);
+  overflow: hidden;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--font);
+  text-align: center;
+}
+
+.sheet-header {
+  flex: none;
+}
+.sheet-title {
+  margin: 0;
+  font-size: 6.2cqmin;
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.sheet-tagline {
+  margin: 0.9cqmin 0 0;
+  font-size: 1.75cqmin;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sheet-grid {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+.sheet-grid .life-grid {
+  width: 100%;
+  height: 100%;
+}
+
+.sheet-stats,
+.sheet-facts {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.25cqmin;
+  margin: 0;
+  background: var(--line);
+  border: 0.25cqmin solid var(--line);
+}
+.sheet-stats > div,
+.sheet-facts > div {
+  background: #fff;
+  padding: 1.2cqmin 0.5cqmin;
+}
+.sheet-stats dt,
+.sheet-facts dt {
+  font-size: 1.3cqmin;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.sheet-stats dd {
+  margin: 0.2cqmin 0 0;
+  font-size: 4cqmin;
+  font-weight: 900;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet-caption {
+  flex: none;
+  margin: 0;
+  font-size: 1.35cqmin;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Poster, portrait: title, grid, then stats along the bottom */
+.sheet-poster .sheet-side {
+  display: contents;
+}
+.sheet-poster .sheet-header {
+  order: 0;
+}
+.sheet-poster .sheet-grid {
+  order: 1;
+}
+.sheet-poster .sheet-stats {
+  order: 2;
+}
+.sheet-poster .sheet-caption {
+  order: 3;
+}
+
+/* Poster, landscape: grid on the left, everything else in a column beside it */
+.sheet-poster.is-landscape {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 4cqmin;
+}
+.sheet-poster.is-landscape .sheet-grid {
+  order: 0;
+  flex: 0 1 auto;
+  aspect-ratio: 0.62;
+  height: 100%;
+}
+.sheet-poster.is-landscape .sheet-side {
+  order: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5cqmin;
+}
+.sheet-poster.is-landscape .sheet-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.sheet-poster.is-landscape .sheet-stats dd {
+  font-size: 6cqmin;
+}
+
+/* Stats page */
+.sheet-stats-page {
+  justify-content: flex-start;
+  gap: 4cqmin;
+}
+.sheet-stats-page .sheet-title {
+  font-size: 5cqmin;
+}
+.sheet-stats-page .sheet-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.sheet-stats-page .sheet-stats > div {
+  padding: 3cqmin 1cqmin;
+}
+.sheet-stats-page .sheet-facts > div {
+  padding: 2cqmin 0.5cqmin;
+}
+.sheet-stats-page .sheet-stats dt {
+  font-size: 1.7cqmin;
+}
+.sheet-stats-page .sheet-stats dd {
+  font-size: 7.5cqmin;
+}
+.sheet-facts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.sheet-facts dd {
+  margin: 0.3cqmin 0 0;
+  font-size: 2.6cqmin;
+  font-weight: 900;
+}
+.sheet-stats-page.is-landscape {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr auto;
+  column-gap: 5cqmin;
+  row-gap: 3cqmin;
+}
+.sheet-stats-page.is-landscape .sheet-header,
+.sheet-stats-page.is-landscape .sheet-caption {
+  grid-column: 1 / -1;
+}
+.sheet-stats-page.is-landscape .sheet-stats {
+  grid-column: 1;
+  grid-row: 2;
+}
+.sheet-stats-page.is-landscape .sheet-facts {
+  grid-column: 1;
+  grid-row: 3;
+  align-self: start;
+}
+.sheet-stats-page.is-landscape .sheet-stages {
+  grid-column: 2;
+  grid-row: 2 / 4;
+}
+.sheet-stats-page.is-landscape .sheet-caption {
+  grid-row: 4;
+  align-self: end;
+}
+
+.sheet-stages {
+  text-align: left;
+}
+.sheet-stages h2 {
+  margin: 0 0 2.5cqmin;
+  font-size: 2.2cqmin;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.sheet-stages ul {
+  display: grid;
+  gap: 2.6cqmin;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sheet-stages li {
+  display: grid;
+  grid-template-columns: 28% 1fr 20%;
+  align-items: center;
+  gap: 2cqmin;
+}
+.stage-label {
+  font-size: 2.1cqmin;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+.stage-label small {
+  display: block;
+  font-size: 1.4cqmin;
+  font-weight: 700;
+  color: var(--muted);
+}
+.stage-bar {
+  display: block;
+  height: 2.8cqmin;
+  border: 0.3cqmin solid;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.stage-bar > span {
+  display: block;
+  height: 100%;
+}
+.stage-count {
+  font-size: 1.9cqmin;
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet-stats-page .sheet-caption {
+  margin-top: auto;
+}
+
+/* ---------- Print dialog ---------- */
+
+.print-dialog {
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100svh - 32px);
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.25);
+}
+.print-dialog::backdrop {
+  background: rgb(30 31 28 / 0.45);
+}
+.print-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+.print-dialog-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.print-preview {
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem;
+  background: var(--line);
+  border-radius: 8px;
+  pointer-events: none;
+  overflow: hidden;
+}
+.print-preview-frame {
+  position: relative;
+  flex: none;
+  max-width: 100%;
+}
+.print-preview-pages {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  transform-origin: top left;
+}
+.print-preview .sheet {
+  flex: none;
+  box-shadow:
+    0 0 0 24px #fff,
+    0 0 0 28px rgb(0 0 0 / 0.08),
+    0 24px 64px 24px rgb(0 0 0 / 0.12);
+}
+
+.print-field {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.print-field legend,
+.print-row .control > span {
+  margin-bottom: 0.5rem;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.print-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.print-choice {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.75rem;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+  line-height: 1.3;
+}
+.print-choice:has(input:checked) {
+  border-color: var(--ink);
+}
+.print-choice input {
+  margin: 0.15rem 0 0;
+  accent-color: var(--accent);
+}
+.print-choice strong {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.print-choice small {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.print-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.5rem;
+}
+.print-row .control:not(.checkbox) {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+.print-row .control.checkbox {
+  padding-bottom: 0.5rem;
+}
+
+.print-tip {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.print-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .print-dialog-body {
+    padding: 1.25rem 1rem;
+  }
+  .print-choices {
+    grid-template-columns: 1fr;
+  }
+  .print-row .control:not(.checkbox) {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- Printing ---------- */
+
+.print-root {
+  display: none;
+}
+
+@media print {
+  html,
+  body {
+    min-height: 0;
+    background: #fff;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .calendar-page,
+  .print-dialog {
+    display: none !important;
+  }
+  .print-root {
+    display: block;
+  }
+  .print-root .sheet {
+    /* A hair short of the page so rounding never spills onto a blank page */
+    height: calc(var(--sheet-height) - 2px);
+    break-after: page;
+    break-inside: avoid;
+  }
+  .print-root .sheet:last-child {
+    break-after: auto;
+  }
+}
