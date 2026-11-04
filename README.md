@@ -10,69 +10,30 @@ A web application based on Kurzgesagt's [Calendar of Your Life Infographic](http
 
 [![YouTube thumbnail](http://i3.ytimg.com/vi/JXeJANDKwDc/maxresdefault.jpg)](https://www.youtube.com/watch?v=JXeJANDKwDc)
 
-## Build Setup
+## Features
+
+- Enter your birthdate once; it is saved in your browser's local storage and never leaves your device.
+- One row per year, 52 weeks per row. Weeks you've lived are filled in and the current week pulses.
+- Rows are colored by life stage (childhood, adolescence, early/middle/mature/late adulthood), with a toggle for a monochrome view.
+- Pick a life expectancy of 70, 80, 90 or 100 years.
+- Hover any week to see its dates and age.
+
+## Development
+
+Requires Node 20+ (see `.nvmrc`).
 
 ```bash
-# install dependencies
-$ npm install
-
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
+npm install
+npm run dev       # dev server with hot reload at http://localhost:5173
+npm test          # unit tests (Vitest)
+npm run build     # typecheck + production build into dist/
+npm run preview   # serve the production build locally
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+Built with [React](https://react.dev), [TypeScript](https://www.typescriptlang.org) and [Vite](https://vite.dev). The calendar is a single responsive SVG; all the date math lives in [`src/lib/life.ts`](src/lib/life.ts).
 
-## Special Directories
+## Deployment
 
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
+Every push to `master` builds the site and publishes it to GitHub Pages via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). The build uses relative asset paths, so it works at `https://<user>.github.io/calendar-of-your-life/` without any extra configuration.
 
-### `assets`
-
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
-
-### `components`
-
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
-
-### `layouts`
-
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
-
-### `pages`
-
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
-
-### `plugins`
-
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+One-time setup: in the repository's **Settings → Pages**, set **Source** to **GitHub Actions**.
