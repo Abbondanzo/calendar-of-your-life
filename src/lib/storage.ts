@@ -4,6 +4,7 @@ import {
   normalizePrintOptions,
   type PrintOptions,
 } from './print'
+import { normalizeCompanion, type Companion } from './companion'
 
 export type Theme = 'system' | 'light' | 'dark'
 
@@ -19,6 +20,7 @@ export interface Settings {
   showStageColors: boolean
   theme: Theme
   print: PrintOptions
+  companion: Companion | null
 }
 
 const KEY = 'calendar-of-your-life:v1'
@@ -29,6 +31,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showStageColors: true,
   theme: 'system',
   print: DEFAULT_PRINT_OPTIONS,
+  companion: null,
 }
 
 function load(): Settings {
@@ -43,6 +46,7 @@ function load(): Settings {
         ? (saved.theme as Theme)
         : DEFAULT_SETTINGS.theme,
       print: normalizePrintOptions(saved.print),
+      companion: normalizeCompanion(saved.companion),
     }
   } catch {
     return DEFAULT_SETTINGS

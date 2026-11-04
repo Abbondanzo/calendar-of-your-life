@@ -8,6 +8,8 @@
   --accent-hover: #cf3324;
   --accent-ink: #ffffff;
   --neutral: #1e1f1c;
+  --together: rgb(77 108 250 / 0.16);
+  --together-edge: rgb(77 108 250 / 0.55);
   --tooltip-accent: #f5a99f;
   --shadow: rgb(0 0 0 / 0.12);
   --backdrop: rgb(30 31 28 / 0.45);
@@ -27,6 +29,8 @@
     --accent-hover: #ff6a56;
     --accent-ink: #ffffff;
     --neutral: #e9e3d7;
+    --together: rgb(140 162 255 / 0.2);
+    --together-edge: rgb(140 162 255 / 0.6);
     --tooltip-accent: #c8321f;
     --shadow: rgb(0 0 0 / 0.45);
     --backdrop: rgb(0 0 0 / 0.6);
@@ -43,6 +47,8 @@
   --accent-hover: #ff6a56;
   --accent-ink: #ffffff;
   --neutral: #e9e3d7;
+  --together: rgb(140 162 255 / 0.2);
+  --together-edge: rgb(140 162 255 / 0.6);
   --tooltip-accent: #c8321f;
   --shadow: rgb(0 0 0 / 0.45);
   --backdrop: rgb(0 0 0 / 0.6);
@@ -554,6 +560,9 @@ a {
   --line: #e4ddd0;
   --accent: #e5402f;
   --neutral: #1e1f1c;
+  --surface: #ffffff;
+  --together: rgb(77 108 250 / 0.16);
+  --together-edge: rgb(77 108 250 / 0.55);
   /* 1% of the sheet's short side. Plain lengths, not container query units,
      so text is laid out and printed at exactly the same size. */
   --u: calc(min(var(--sheet-width), var(--sheet-height)) / 100);
@@ -799,6 +808,173 @@ a {
 
 .sheet-stats-page .sheet-caption {
   margin-top: auto;
+}
+
+/* ---------- Two lives ---------- */
+
+.together-band {
+  fill: var(--together);
+  stroke: var(--together-edge);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.together-birth {
+  fill: none;
+  stroke: var(--together-edge);
+  stroke-width: 2;
+}
+.tooltip-together {
+  font-weight: 800;
+}
+.together-swatch {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  border: 1px solid var(--together-edge);
+  border-radius: 3px;
+  background: var(--together);
+}
+
+.companion-panel {
+  max-width: 760px;
+  margin: 3rem auto 0;
+}
+.companion-panel .section-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.companion-panel .section-lede {
+  margin: 0.4rem 0 1.25rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.companion-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+.companion-form .error {
+  flex-basis: 100%;
+  margin: 0;
+}
+.companion-form-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.companion-panel .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.companion-panel .field.grow {
+  flex: 1 1 200px;
+}
+.companion-panel .field input,
+.companion-panel .field select {
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  /* 16px keeps iOS Safari from zooming the page when the field is focused */
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.companion-panel .field input::placeholder {
+  color: var(--muted);
+  font-weight: 500;
+}
+.companion-panel .field input[aria-invalid='true'] {
+  border-color: var(--accent);
+}
+.companion-panel .button.small {
+  height: 2.75rem;
+  padding: 0 1.5rem;
+  font-size: 0.85rem;
+}
+
+.companion-card {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.companion-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.companion-legend .together-swatch {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+.companion-legend strong {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+.companion-legend small {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.companion-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 1rem 0 0;
+  background: var(--line);
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.companion-stats > div {
+  background: var(--surface);
+  padding: 0.75rem 0.5rem;
+}
+.companion-stats dt {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.companion-stats dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.6rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.companion-note {
+  margin: 1rem 0 0;
+  color: var(--muted);
+}
+.companion-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .companion-stats {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---------- Print dialog ---------- */

@@ -8,7 +8,8 @@ import {
 } from '../lib/life'
 import { formatDate, formatNumber } from '../lib/format'
 import type { PrintOptions } from '../lib/print'
-import { StaticLifeGrid } from './LifeGrid'
+import { StaticLifeGrid, type Shared } from './LifeGrid'
+import { togetherStats } from '../lib/companion'
 
 interface Props {
   birth: Date
@@ -17,6 +18,7 @@ interface Props {
   lifeExpectancy: number
   showStageColors: boolean
   options: PrintOptions
+  together: Shared | null
   /** Previews skip the accessible labels, since the real page has them. */
   preview?: boolean
 }
@@ -59,15 +61,24 @@ function Caption({
   birth,
   today,
   lifeExpectancy,
+  together,
 }: {
   birth: Date
   today: Date
   lifeExpectancy: number
+  together: Shared | null
 }) {
   return (
     <p className="sheet-caption">
       Born {formatDate(birth)} · As of {formatDate(today)} · Living to{' '}
       {lifeExpectancy}
+      {together && (
+        <>
+          {' · '}
+          <span className="together-swatch" aria-hidden="true" /> Shaded:{' '}
+          {together.companion.name}'s lifetime
+        </>
+      )}
     </p>
   )
 }
@@ -78,6 +89,7 @@ function StatsPage({
   stats,
   lifeExpectancy,
   showStageColors,
+  together,
 }: Omit<Props, 'options' | 'preview'>) {
   const { position } = stats
   const stage = stageForAge(position.age)
@@ -92,6 +104,21 @@ function StatsPage({
     ['Calendar ends', formatDate(birthdayAt(birth, lifeExpectancy))],
     ['Total weeks', formatNumber(lifeExpectancy * WEEKS_PER_YEAR)],
   ]
+  if (together) {
+    const { companion, span } = together
+    const shared = togetherStats(
+      span,
+      position.index,
+      lifeExpectancy,
+      companion,
+      today,
+    )
+    facts.push(
+      [`Weeks with ${companion.name}`, formatNumber(shared.lived)],
+      [`Weeks ahead with ${companion.name}`, formatNumber(shared.ahead)],
+      [`${companion.name}'s age`, `${shared.theirAge ?? 'Not born yet'}`],
+    )
+  }
 
   return (
     <>
@@ -133,7 +160,12 @@ function StatsPage({
           })}
         </ul>
       </section>
-      <Caption birth={birth} today={today} lifeExpectancy={lifeExpectancy} />
+      <Caption
+        birth={birth}
+        today={today}
+        lifeExpectancy={lifeExpectancy}
+        together={together}
+      />
     </>
   )
 }
@@ -144,14 +176,22 @@ function StatsPage({
  * design holds from a letter page up to a wall poster.
  */
 export function PrintSheets(props: Props) {
-  const { birth, today, stats, lifeExpectancy, showStageColors, options } =
-    props
+  const {
+    birth,
+    today,
+    stats,
+    lifeExpectancy,
+    showStageColors,
+    options,
+    together,
+  } = props
   const grid = (
     <div className="sheet-grid">
       <StaticLifeGrid
         years={stats.years}
         current={stats.position}
         showStageColors={showStageColors}
+        together={together}
         ariaLabel={
           props.preview
             ? undefined
@@ -176,6 +216,7 @@ export function PrintSheets(props: Props) {
             birth={birth}
             today={today}
             lifeExpectancy={lifeExpectancy}
+            together={together}
           />
         </section>
         <section className={`sheet sheet-stats-page is-${options.orientation}`}>
@@ -185,6 +226,7 @@ export function PrintSheets(props: Props) {
             stats={stats}
             lifeExpectancy={lifeExpectancy}
             showStageColors={showStageColors}
+            together={together}
           />
         </section>
       </>
@@ -196,7 +238,12 @@ export function PrintSheets(props: Props) {
       <div className="sheet-side">
         <Heading />
         <StatList stats={stats} />
-        <Caption birth={birth} today={today} lifeExpectancy={lifeExpectancy} />
+        <Caption
+          birth={birth}
+          today={today}
+          lifeExpectancy={lifeExpectancy}
+          together={together}
+        />
       </div>
       {grid}
     </section>

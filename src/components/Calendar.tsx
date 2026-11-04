@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { lifeStats } from '../lib/life'
 import { THEMES, type Settings, type Theme } from '../lib/storage'
@@ -7,6 +7,8 @@ import { printCss, type PrintOptions } from '../lib/print'
 import { LifeGrid } from './LifeGrid'
 import { PrintDialog } from './PrintDialog'
 import { PrintSheets } from './PrintSheets'
+import { CompanionPanel } from './CompanionPanel'
+import { companionSpan, togetherStats } from '../lib/companion'
 
 interface Props {
   birth: Date
@@ -93,7 +95,28 @@ export function Calendar({ birth, settings, onChange }: Props) {
   const openDialog = useCallback(() => setDialogOpen(true), [])
   usePrintShortcut(openDialog, dialogOpen)
 
-  const sheetProps = { birth, today, stats, lifeExpectancy, showStageColors }
+  const { companion } = settings
+  const span = useMemo(
+    () => (companion ? companionSpan(birth, years, companion) : null),
+    [birth, years, companion],
+  )
+  const together = useMemo(
+    () => (companion && span ? { companion, span } : null),
+    [companion, span],
+  )
+  const shared =
+    companion && span
+      ? togetherStats(span, position.index, lifeExpectancy, companion, today)
+      : null
+
+  const sheetProps = {
+    birth,
+    today,
+    stats,
+    lifeExpectancy,
+    showStageColors,
+    together,
+  }
   const updatePrint = (patch: Partial<PrintOptions>) =>
     onChange({ print: { ...printOptions, ...patch } })
 
@@ -185,7 +208,16 @@ export function Calendar({ birth, settings, onChange }: Props) {
             years={years}
             current={position}
             showStageColors={showStageColors}
+            together={together}
             ariaLabel={`A grid of ${formatNumber(totalWeeks)} weeks, one row per year. ${formatNumber(weeksLived)} weeks are filled in.`}
+          />
+          <CompanionPanel
+            companion={companion}
+            together={shared}
+            onGrid={span !== null}
+            defaultExpectancy={lifeExpectancy}
+            expectancyOptions={EXPECTANCY_OPTIONS}
+            onChange={(next) => onChange({ companion: next })}
           />
         </main>
 
