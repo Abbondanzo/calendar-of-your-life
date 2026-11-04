@@ -1,31 +1,53 @@
-/* Giga Sans, served from the repo as one family with real weights. */
+/* Giga Sans, served from the repo as one family with real weights.
+ *
+ * The font's own vertical metrics put capitals well above the middle of the
+ * line box (it ships 700/-300 typo metrics plus a 300 line gap, flagged for
+ * use, but 1000/-300 hhea metrics), and platforms disagree about which set to
+ * use. These overrides make every platform agree, with the cap height
+ * (700) centered in a 1.2em content box, so all-caps labels sit in the middle
+ * of buttons, selects and checkbox rows. */
 @font-face {
   font-family: 'Giga Sans';
   font-weight: 400;
   font-display: swap;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
   src: url('../assets/fonts/giga-sans-regular.woff') format('woff');
 }
 @font-face {
   font-family: 'Giga Sans';
   font-weight: 500;
   font-display: swap;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
   src: url('../assets/fonts/giga-sans-medium.woff') format('woff');
 }
 @font-face {
   font-family: 'Giga Sans';
   font-weight: 700;
   font-display: swap;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
   src: url('../assets/fonts/giga-sans-bold.woff') format('woff');
 }
 @font-face {
   font-family: 'Giga Sans';
   font-weight: 800;
   font-display: swap;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
   src: url('../assets/fonts/giga-sans-extra-bold.woff') format('woff');
 }
 @font-face {
   font-family: 'Giga Sans';
   font-weight: 900;
   font-display: swap;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
   src: url('../assets/fonts/giga-sans-black.woff') format('woff');
 }

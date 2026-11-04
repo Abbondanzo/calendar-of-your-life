@@ -554,14 +554,15 @@ a {
   --line: #e4ddd0;
   --accent: #e5402f;
   --neutral: #1e1f1c;
-  container-type: size;
+  /* 1% of the sheet's short side. Plain lengths, not container query units,
+     so text is laid out and printed at exactly the same size. */
+  --u: calc(min(var(--sheet-width), var(--sheet-height)) / 100);
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2.4cqmin;
+  gap: calc(2.4 * var(--u));
   width: var(--sheet-width);
   height: var(--sheet-height);
-  overflow: hidden;
   background: #fff;
   color: var(--ink);
   font-family: var(--font);
@@ -573,15 +574,15 @@ a {
 }
 .sheet-title {
   margin: 0;
-  font-size: 6.2cqmin;
+  font-size: calc(6.2 * var(--u));
   font-weight: 900;
-  line-height: 1.02;
+  line-height: 1.15;
   letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 .sheet-tagline {
-  margin: 0.9cqmin 0 0;
-  font-size: 1.75cqmin;
+  margin: calc(0.9 * var(--u)) 0 0;
+  font-size: calc(1.75 * var(--u));
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -603,27 +604,27 @@ a {
   flex: none;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.25cqmin;
+  gap: calc(0.25 * var(--u));
   margin: 0;
   background: var(--line);
-  border: 0.25cqmin solid var(--line);
+  border: calc(0.25 * var(--u)) solid var(--line);
 }
 .sheet-stats > div,
 .sheet-facts > div {
   background: #fff;
-  padding: 1.2cqmin 0.5cqmin;
+  padding: calc(1.2 * var(--u)) calc(0.5 * var(--u));
 }
 .sheet-stats dt,
 .sheet-facts dt {
-  font-size: 1.3cqmin;
+  font-size: calc(1.3 * var(--u));
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
 }
 .sheet-stats dd {
-  margin: 0.2cqmin 0 0;
-  font-size: 4cqmin;
+  margin: calc(0.2 * var(--u)) 0 0;
+  font-size: calc(4 * var(--u));
   font-weight: 900;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
@@ -632,7 +633,7 @@ a {
 .sheet-caption {
   flex: none;
   margin: 0;
-  font-size: 1.35cqmin;
+  font-size: calc(1.35 * var(--u));
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -660,7 +661,7 @@ a {
 .sheet-poster.is-landscape {
   flex-direction: row;
   align-items: stretch;
-  gap: 4cqmin;
+  gap: calc(4 * var(--u));
 }
 .sheet-poster.is-landscape .sheet-grid {
   order: 0;
@@ -674,52 +675,52 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 5cqmin;
+  gap: calc(5 * var(--u));
 }
 .sheet-poster.is-landscape .sheet-stats {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .sheet-poster.is-landscape .sheet-stats dd {
-  font-size: 6cqmin;
+  font-size: calc(6 * var(--u));
 }
 
 /* Stats page */
 .sheet-stats-page {
   justify-content: flex-start;
-  gap: 4cqmin;
+  gap: calc(4 * var(--u));
 }
 .sheet-stats-page .sheet-title {
-  font-size: 5cqmin;
+  font-size: calc(5 * var(--u));
 }
 .sheet-stats-page .sheet-stats {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .sheet-stats-page .sheet-stats > div {
-  padding: 3cqmin 1cqmin;
+  padding: calc(3 * var(--u)) calc(1 * var(--u));
 }
 .sheet-stats-page .sheet-facts > div {
-  padding: 2cqmin 0.5cqmin;
+  padding: calc(2 * var(--u)) calc(0.5 * var(--u));
 }
 .sheet-stats-page .sheet-stats dt {
-  font-size: 1.7cqmin;
+  font-size: calc(1.7 * var(--u));
 }
 .sheet-stats-page .sheet-stats dd {
-  font-size: 7.5cqmin;
+  font-size: calc(7.5 * var(--u));
 }
 .sheet-facts {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .sheet-facts dd {
-  margin: 0.3cqmin 0 0;
-  font-size: 2.6cqmin;
+  margin: calc(0.3 * var(--u)) 0 0;
+  font-size: calc(2.6 * var(--u));
   font-weight: 900;
 }
 .sheet-stats-page.is-landscape {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-rows: auto auto 1fr auto;
-  column-gap: 5cqmin;
-  row-gap: 3cqmin;
+  column-gap: calc(5 * var(--u));
+  row-gap: calc(3 * var(--u));
 }
 .sheet-stats-page.is-landscape .sheet-header,
 .sheet-stats-page.is-landscape .sheet-caption {
@@ -747,15 +748,15 @@ a {
   text-align: left;
 }
 .sheet-stages h2 {
-  margin: 0 0 2.5cqmin;
-  font-size: 2.2cqmin;
+  margin: 0 0 calc(2.5 * var(--u));
+  font-size: calc(2.2 * var(--u));
   font-weight: 900;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 .sheet-stages ul {
   display: grid;
-  gap: 2.6cqmin;
+  gap: calc(2.6 * var(--u));
   margin: 0;
   padding: 0;
   list-style: none;
@@ -764,24 +765,24 @@ a {
   display: grid;
   grid-template-columns: 28% 1fr 20%;
   align-items: center;
-  gap: 2cqmin;
+  gap: calc(2 * var(--u));
 }
 .stage-label {
-  font-size: 2.1cqmin;
+  font-size: calc(2.1 * var(--u));
   font-weight: 900;
   text-transform: uppercase;
   line-height: 1.15;
 }
 .stage-label small {
   display: block;
-  font-size: 1.4cqmin;
+  font-size: calc(1.4 * var(--u));
   font-weight: 700;
   color: var(--muted);
 }
 .stage-bar {
   display: block;
-  height: 2.8cqmin;
-  border: 0.3cqmin solid;
+  height: calc(2.8 * var(--u));
+  border: calc(0.3 * var(--u)) solid;
   border-radius: 999px;
   overflow: hidden;
 }
@@ -790,7 +791,7 @@ a {
   height: 100%;
 }
 .stage-count {
-  font-size: 1.9cqmin;
+  font-size: calc(1.9 * var(--u));
   font-weight: 800;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -864,7 +865,7 @@ a {
   border: 0;
 }
 .print-field legend,
-.print-row .control > span {
+.print-row .control:not(.checkbox) > span {
   margin-bottom: 0.5rem;
   padding: 0;
   font-size: 0.8rem;
@@ -953,11 +954,15 @@ a {
 }
 
 @media print {
-  html,
+  /* Paper is white whatever the screen theme, margins included */
+  :root,
+  :root[data-theme] {
+    color-scheme: light !important;
+    background: #fff;
+  }
   body {
     min-height: 0;
     background: #fff;
-    color-scheme: light;
   }
   * {
     -webkit-print-color-adjust: exact;
