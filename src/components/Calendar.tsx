@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { lifeStats } from '../lib/life'
-import type { Settings } from '../lib/storage'
+import { THEMES, type Settings, type Theme } from '../lib/storage'
 import { formatNumber } from '../lib/format'
 import { printCss, type PrintOptions } from '../lib/print'
 import { LifeGrid } from './LifeGrid'
@@ -128,6 +128,19 @@ export function Calendar({ birth, settings, onChange }: Props) {
                 }
               />
               <span>Stage colors</span>
+            </label>
+            <label className="control">
+              <span>Theme</span>
+              <select
+                value={settings.theme}
+                onChange={(e) => onChange({ theme: e.target.value as Theme })}
+              >
+                {THEMES.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
             </label>
             <button
               type="button"

@@ -8,7 +8,17 @@
       name="description"
       content="Track how many weeks of your life you have spent already and how many you have left."
     />
-    <meta name="theme-color" content="#fdf8f0" />
+    <meta name="theme-color" content="#fbf6ee" />
+    <script>
+      // Apply a saved light/dark choice before first paint so the page never flashes.
+      try {
+        var theme = JSON.parse(
+          localStorage.getItem('calendar-of-your-life:v1') || '{}',
+        ).theme
+        if (theme === 'light' || theme === 'dark')
+          document.documentElement.dataset.theme = theme
+      } catch (e) {}
+    </script>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link
       rel="icon"

@@ -25,7 +25,8 @@ export const STAGES: readonly Stage[] = [
   { name: 'Late Adulthood', start: 80, end: 100, color: '#5fcf74' },
 ]
 
-export const NEUTRAL_COLOR = '#1e1f1c'
+/** Follows the theme: near-black on light backgrounds, near-white on dark ones. */
+export const NEUTRAL_COLOR = 'var(--neutral)'
 
 /** Parses a `YYYY-MM-DD` string (as produced by `<input type="date">`) as a local date. */
 export function parseISODate(value: string): Date | null {

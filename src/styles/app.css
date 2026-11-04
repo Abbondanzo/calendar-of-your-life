@@ -5,9 +5,48 @@
   --muted: #6b6a64;
   --line: #e4ddd0;
   --accent: #e5402f;
+  --accent-hover: #cf3324;
   --accent-ink: #ffffff;
-  --font: 'Giga Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --neutral: #1e1f1c;
+  --tooltip-accent: #f5a99f;
+  --shadow: rgb(0 0 0 / 0.12);
+  --backdrop: rgb(30 31 28 / 0.45);
   color-scheme: light;
+  --font: 'Giga Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Dark theme: follows the OS unless the reader picked light, or forced on. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #141513;
+    --surface: #1e1f1c;
+    --ink: #f3ede2;
+    --muted: #a3a097;
+    --line: #34352f;
+    --accent: #f0533f;
+    --accent-hover: #ff6a56;
+    --accent-ink: #ffffff;
+    --neutral: #e9e3d7;
+    --tooltip-accent: #c8321f;
+    --shadow: rgb(0 0 0 / 0.45);
+    --backdrop: rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #141513;
+  --surface: #1e1f1c;
+  --ink: #f3ede2;
+  --muted: #a3a097;
+  --line: #34352f;
+  --accent: #f0533f;
+  --accent-hover: #ff6a56;
+  --accent-ink: #ffffff;
+  --neutral: #e9e3d7;
+  --tooltip-accent: #c8321f;
+  --shadow: rgb(0 0 0 / 0.45);
+  --backdrop: rgb(0 0 0 / 0.6);
+  color-scheme: dark;
 }
 
 *,
@@ -90,8 +129,8 @@ a {
   font-size: 1.05rem;
 }
 .button.primary:hover {
-  background: #cf3324;
-  border-color: #cf3324;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 .button.ghost {
   font-size: 0.8rem;
@@ -375,7 +414,7 @@ a {
   color: var(--bg);
   font-size: 0.8rem;
   line-height: 1.35;
-  box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
+  box-shadow: 0 6px 20px var(--shadow);
   --tx: -50%;
   --ty: -100%;
   transform: translate(var(--tx), var(--ty));
@@ -396,7 +435,7 @@ a {
 }
 .tooltip em {
   font-style: normal;
-  color: #f5a99f;
+  color: var(--tooltip-accent);
   font-weight: 700;
 }
 
@@ -408,7 +447,7 @@ a {
   flex-direction: column;
   border: 2px solid var(--ink);
   background: var(--surface);
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+  box-shadow: 0 4px 14px var(--shadow);
 }
 .zoom-controls button {
   appearance: none;
@@ -509,6 +548,12 @@ a {
  */
 
 .sheet {
+  /* A sheet is paper, so it keeps the light palette whatever the theme */
+  --ink: #1e1f1c;
+  --muted: #6b6a64;
+  --line: #e4ddd0;
+  --accent: #e5402f;
+  --neutral: #1e1f1c;
   container-type: size;
   position: relative;
   display: flex;
@@ -765,10 +810,10 @@ a {
   border-radius: 12px;
   background: var(--bg);
   color: var(--ink);
-  box-shadow: 0 20px 60px rgb(0 0 0 / 0.25);
+  box-shadow: 0 20px 60px var(--shadow);
 }
 .print-dialog::backdrop {
-  background: rgb(30 31 28 / 0.45);
+  background: var(--backdrop);
 }
 .print-dialog-body {
   display: flex;
@@ -912,6 +957,7 @@ a {
   body {
     min-height: 0;
     background: #fff;
+    color-scheme: light;
   }
   * {
     -webkit-print-color-adjust: exact;
