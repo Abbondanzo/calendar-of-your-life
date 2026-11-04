@@ -5,10 +5,19 @@ import {
   type PrintOptions,
 } from './print'
 
+export type Theme = 'system' | 'light' | 'dark'
+
+export const THEMES: readonly { id: Theme; label: string }[] = [
+  { id: 'system', label: 'System' },
+  { id: 'light', label: 'Light' },
+  { id: 'dark', label: 'Dark' },
+]
+
 export interface Settings {
   birthday: string | null
   lifeExpectancy: number
   showStageColors: boolean
+  theme: Theme
   print: PrintOptions
 }
 
@@ -18,6 +27,7 @@ export const DEFAULT_SETTINGS: Settings = {
   birthday: null,
   lifeExpectancy: 90,
   showStageColors: true,
+  theme: 'system',
   print: DEFAULT_PRINT_OPTIONS,
 }
 
@@ -29,6 +39,9 @@ function load(): Settings {
     return {
       ...DEFAULT_SETTINGS,
       ...saved,
+      theme: THEMES.some((t) => t.id === saved.theme)
+        ? (saved.theme as Theme)
+        : DEFAULT_SETTINGS.theme,
       print: normalizePrintOptions(saved.print),
     }
   } catch {
