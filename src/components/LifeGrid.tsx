@@ -40,6 +40,11 @@ function colorFor(age: number, showStageColors: boolean) {
   return (showStageColors && stageForAge(age)?.color) || NEUTRAL_COLOR
 }
 
+/** A full circle as path data: two half-circle arcs. */
+function circlePath(x: number, y: number, r: number) {
+  return `M${x - r},${y}a${r},${r} 0 1,0 ${2 * r},0a${r},${r} 0 1,0 ${-2 * r},0`
+}
+
 /** Arrow from (x1,y1) to (x2,y2) with an open head. */
 function Arrow({
   x1,
@@ -77,26 +82,36 @@ export const Poster = memo(function Poster({
   const gridRight = LEFT + WEEKS_PER_YEAR * STEP
   const gridBottom = TOP + years * STEP
 
-  const circles = []
+  // One path per row (split where the row turns from lived to ahead) rather
+  // than one <circle> per week: ~100 elements instead of thousands keeps
+  // rendering, painting and compositing cheap, while rows that are scrolled
+  // out of view when zoomed in can still be skipped. The circles never
+  // overlap, so it looks the same.
+  const groups = new Map<
+    string,
+    { color: string; past: boolean; d: string[] }
+  >()
   for (let age = 0; age < years; age++) {
     const color = colorFor(age, showStageColors)
     for (let week = 0; week < WEEKS_PER_YEAR; week++) {
       const index = age * WEEKS_PER_YEAR + week
       if (index === currentIndex) continue // drawn separately, on top
       const past = index < currentIndex
-      circles.push(
-        <circle
-          key={index}
-          cx={cx(week)}
-          cy={cy(age)}
-          r={RADIUS}
-          stroke={color}
-          fill={past ? color : 'none'}
-          className={past ? 'cell past' : 'cell'}
-        />,
-      )
+      const key = `${age} ${past}`
+      let group = groups.get(key)
+      if (!group) groups.set(key, (group = { color, past, d: [] }))
+      group.d.push(circlePath(cx(week), cy(age), RADIUS))
     }
   }
+  const cells = [...groups.entries()].map(([key, { color, past, d }]) => (
+    <path
+      key={key}
+      d={d.join('')}
+      stroke={color}
+      fill={past ? color : 'none'}
+      className={past ? 'cell past' : 'cell'}
+    />
+  ))
 
   const weekLabels = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
   const yearLabels = []
@@ -187,7 +202,7 @@ export const Poster = memo(function Poster({
         )
       })}
 
-      <g className="cells">{circles}</g>
+      <g className="cells">{cells}</g>
       <rect
         className="hit-area"
         x={LEFT}
@@ -208,23 +223,9 @@ export function posterSize(years: number) {
 }
 
 /** The current week, drawn above the rest of the grid. */
-function CurrentWeek({
-  current,
-  pulse,
-}: {
-  current: LifePosition
-  pulse: boolean
-}) {
+function CurrentWeek({ current }: { current: LifePosition }) {
   return (
     <g className="current">
-      {pulse && (
-        <circle
-          className="current-pulse"
-          cx={cx(current.week)}
-          cy={cy(current.age)}
-          r={RADIUS}
-        />
-      )}
       <circle
         className="current-cell"
         cx={cx(current.week)}
@@ -264,7 +265,7 @@ export function StaticLifeGrid({
         currentIndex={current.index}
         showStageColors={showStageColors}
       />
-      {current.age < years && <CurrentWeek current={current} pulse={false} />}
+      {current.age < years && <CurrentWeek current={current} />}
     </svg>
   )
 }
@@ -300,6 +301,7 @@ export function LifeGrid({
     onTap: (x, y) => setSelected(cellAt(x, y)),
   })
   const { view } = zoom
+  const transform = `translate(${view.x} ${view.y}) scale(${view.scale})`
 
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     zoom.handlers.onPointerMove(event)
@@ -370,13 +372,27 @@ export function LifeGrid({
         onPointerLeave={handlePointerLeave}
       >
         <svg className="life-grid" role="img" aria-label={ariaLabel}>
-          <g transform={`translate(${view.x} ${view.y}) scale(${view.scale})`}>
+          <g transform={transform}>
             <Poster
               years={years}
               currentIndex={current.index}
               showStageColors={showStageColors}
             />
-            {current.age < years && <CurrentWeek current={current} pulse />}
+            {current.age < years && <CurrentWeek current={current} />}
+          </g>
+        </svg>
+        {/* The pulse and hover ring live in their own small SVG on top, so
+            the animation and hovering don't invalidate the grid below. */}
+        <svg className="life-grid-overlay" aria-hidden="true">
+          <g transform={transform}>
+            {current.age < years && (
+              <circle
+                className="current-pulse"
+                cx={cx(current.week)}
+                cy={cy(current.age)}
+                r={RADIUS}
+              />
+            )}
             {selected && (
               <circle
                 className="selected-ring"
