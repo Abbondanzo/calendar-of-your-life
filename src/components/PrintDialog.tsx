@@ -111,7 +111,8 @@ export function PrintDialog({
                 } as CSSProperties
               }
             >
-              <PrintSheets {...sheet} options={options} preview />
+              {/* Only while open: the preview is a whole second copy of the grid */}
+              {open && <PrintSheets {...sheet} options={options} preview />}
             </div>
           </div>
         </div>
